@@ -1,0 +1,63 @@
+{
+  "name": "team-mode",
+  "version": "0.0.1",
+  "displayName": "Team Mode (demo)",
+  "description": "Demo of Swarm Team Mode as an installable app: lead group chat (main, threads, @ assigns, @everyone), direct messages, a secretary brief per lead, a bar raiser per room, and a view of word passed inside one tree through the nearest common parent. Data lives only in this app's own directory; disabling the app removes every tool, page and wake.",
+  "author": "Team Mode demo",
+  "tags": ["collaboration", "agents", "demo"],
+  "highlights": [
+    "Leads talk in a group or a DM through one append-only ledger in the app's own data directory",
+    "Wakes carry a pointer, never a message body",
+    "Hop, rate and budget limits are counted by the app from the ledger, with an emergency stop"
+  ],
+  "defaultEnabled": false,
+  "platform": {
+    "os": ["linux", "macos"]
+  },
+  "backend": {
+    "hooks": {
+      "routes": "teamapp.hooks:register_routes",
+      "on_startup": "teamapp.hooks:on_startup",
+      "on_shutdown": "teamapp.hooks:on_shutdown"
+    }
+  },
+  "agents": ["agents/lead.json", "agents/secretary.json", "agents/bar-raiser.json"],
+  "ui": {
+    "entry": "index.mjs",
+    "pages": [
+      {
+        "route": "/apps/team-mode",
+        "label": "Team Mode"
+      }
+    ]
+  },
+  "contributes": {
+    "panelTabs": [
+      {
+        "id": "team-mode",
+        "title": "Team Mode",
+        "menuLabel": "Team Mode",
+        "menuDescription": "This Bot's Team Mode groups: add it to a group or take it out of the team",
+        "icon": "Users",
+        "entry": "panel.mjs"
+      }
+    ],
+    "botChatServers": [{ "agent": "lead", "server": "team" }]
+  },
+  "permissions": {
+    "api": ["/api/apps/team-mode", "/api/apps/team-mode/*", "/api/members", "/api/workspaces", "/api/teams",
+            "/api/chat/slots/*", "/api/bot-chat-app-tools/*"],
+    "storage": true,
+    "spawn": true,
+    "cron": true,
+    "mcpTools": [
+      "team_whoami", "team_directory", "team_channels", "team_send", "team_inbox_read",
+      "team_inbox_peek", "team_thread_read", "team_assignments", "team_group_open", "team_relay_note",
+      "team_meeting_convene", "team_meeting_invite", "team_meeting_respond", "team_meeting_read",
+      "team_meeting_speak", "team_meeting_progress", "team_meeting_vote", "team_meeting_action_propose",
+      "team_meeting_action_respond", "team_meeting_adjourn", "team_meeting_request_bar_raiser",
+      "team_meeting_list", "team_meeting_status", "team_todo_list", "team_todo_close",
+      "cron_add", "cron_remove", "cron_list", "work_report"
+    ]
+  }
+}

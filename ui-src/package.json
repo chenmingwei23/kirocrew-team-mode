@@ -1,0 +1,17 @@
+{
+  "name": "kirocrew-team-mode-app-ui",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "test": "node --test src/model.test.js src/needsYou.test.js src/meetingStage.test.js src/leadsNow.test.js src/botSource.test.js src/msgBack.test.js",
+    "build:preview": "vite build --config preview/vite.preview.config.js"
+  },
+  "devDependencies": {
+    "lucide-react": "1.7.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "vite": "^6.0.0"
+  }
+}

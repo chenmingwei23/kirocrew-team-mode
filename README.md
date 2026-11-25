@@ -1,7 +1,62 @@
-# Team Mode
+# Team Mode (demo app)
 
-A KiroCrew app for Bots that work as a team: a lead group chat with threads and
-@ assignments, direct messages, meetings, a secretary brief per lead and a bar
-raiser per room.
+A demo of Swarm Team Mode built only on the Kiro Crew app platform. It changes no
+core code. Disable the app and every page, tool, route and wake it added is gone;
+its data stays in its own data directory until you uninstall with `--purge-data`.
 
-Installed locally for now with `kirocrew app install <path-to-this-checkout>`.
+## Why it is a standalone app directory, not a builtin
+
+A builtin lives under `src/kiro_crew/apps/builtins/` and is loaded from the
+installed `kiro_crew` package, so trying one means running this branch's gateway.
+A directory installed with `kirocrew app install <path>` is copied into
+`<data home>/apps/team-mode/` and goes live on the gateway that is already running
+(`kirocrew app enable` applies live over the owner socket; hook routes register on
+enable without a restart). That is the only way to demo it on the live gateway
+without switching it to branch code.
+
+## Layout
+
+| Path | Runs in | Job |
+|---|---|---|
+| `app.json` | gateway | Manifest. `defaultEnabled: false` |
+| `teamapp/hooks.py` | gateway process | HTTP routes under `/api/apps/team-mode/`, wake loop, secretary and bar raiser runs |
+| `teamapp/*.py` | gateway and MCP server | Ledger, folds, limits (shared code) |
+| `agents/lead.json` | kiro-cli | The demo lead agent. The `team` MCP server is declared here, not at manifest top level, so only sessions running this agent get the tools; the owner's other sessions never see them |
+| `mcp/server.py` | one stdio process per lead session | The tools leads call |
+| `ui/index.mjs` | browser | The Team Mode page (`export default` React component) |
+
+## Install (live gateway, no restart)
+
+```bash
+kirocrew app install <path-to-this-checkout>
+# trust it once: App Store -> Team Mode -> Enable, confirm the third-party dialog
+kirocrew app enable team-mode
+kirocrew app disable team-mode     # off switch; data kept
+```
+
+After editing the source, `kirocrew app update team-mode` re-copies it and restarts
+the app's hooks, keeping data.
+
+## Team tools in a Bot's own chat
+
+`contributes.botChatServers` offers the `team` server of the `lead` agent to the
+chats of the owner's Bots, and `permissions.bots` declares the `tools` scope that
+mounts it. The server joins a Bot's own chat only when all of these hold:
+
+1. the gateway has the `bot_chat_app_tools` feature preview on;
+2. Team Mode is enabled;
+3. the owner approved the `tools` Bot scope on the app's detail page;
+4. the owner ticked the Bot under "Bots this app can reach".
+
+The "Answer from its own chat" switch on a Bot's Team Mode tab ticks or unticks
+that one Bot in the same list (`/api/apps/team-mode/bot-grants`). Unticking takes
+the tools off at the start of the chat's next turn. A Bot pinned to the Kiro CLI
+harness gets no app servers; pin it to Kiro Agent, Claude Code or Codex.
+
+## Tests
+
+```bash
+python3 -m pytest tests/<file>.py      # backend, one file at a time
+cd ui-src && npm ci && npm test        # UI model tests (node --test)
+cd ui-src && npm run build             # rebuilds ui/index.mjs and ui/panel.mjs
+```

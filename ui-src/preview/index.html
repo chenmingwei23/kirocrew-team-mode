@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="kiro-dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Team Mode preview (screenshots only)</title>
+  <script>
+    // ?theme=kiro-light|kiro-dark|light|dark picks the host palette.
+    document.documentElement.dataset.theme = new URLSearchParams(location.search).get('theme') || 'kiro-dark'
+  </script>
+  <!-- The same bare-specifier map the dashboard writes (website/scripts/lib/basePath.mjs). -->
+  <script type="importmap">
+  {"imports": {
+    "react": "/vendor/react.mjs",
+    "react-dom": "/vendor/react-dom.mjs",
+    "react-dom/client": "/vendor/react-dom-client.mjs",
+    "react/jsx-runtime": "/vendor/react-jsx-runtime.mjs",
+    "@kirocrew/app-sdk": "/vendor/kirocrew-app-sdk.mjs",
+    "@kirocrew/app-sdk/ui": "/vendor/kirocrew-ui.mjs",
+    "lucide-react": "/vendor/lucide-react.mjs"
+  }}
+  </script>
+  <!-- HOST_CSS -->
+  <style>html, body { margin: 0; height: 100%; background: var(--bg); } #root { height: 100vh; display: flex; flex-direction: column; }</style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/shell.js"></script>
+</body>
+</html>

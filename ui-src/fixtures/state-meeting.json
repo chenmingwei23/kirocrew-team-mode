@@ -1,0 +1,2671 @@
+{
+ "cursor": "G-53099458:82",
+ "now": 1794001330.0,
+ "stopped": false,
+ "stop_reason": null,
+ "leads": [
+  {
+   "lead_id": "L-1481a214",
+   "handle": "tm-demo-api-lead",
+   "session_label": "dashboard:chat-900",
+   "kind": "chat",
+   "registered_ts": 1794093970.604,
+   "active": true
+  },
+  {
+   "lead_id": "L-3c4ed7b0",
+   "handle": "tm-demo-web-lead",
+   "session_label": "dashboard:chat-901",
+   "kind": "chat",
+   "registered_ts": 1794093970.608,
+   "active": true
+  },
+  {
+   "lead_id": "L-df2af15a",
+   "handle": "tm-demo-docs-lead",
+   "session_label": "dashboard:chat-902",
+   "kind": "chat",
+   "registered_ts": 1794093970.61,
+   "active": true
+  }
+ ],
+ "channels": [
+  {
+   "id": "G-53099458",
+   "kind": "group",
+   "title": "share-api-v2",
+   "members": [
+    "L-1481a214",
+    "L-3c4ed7b0",
+    "L-df2af15a"
+   ],
+   "people": [
+    "owner"
+   ],
+   "creator": "owner",
+   "managers": [
+    "L-1481a214"
+   ],
+   "bar_raiser": "default",
+   "cooling_until": 0.0,
+   "seq": 82,
+   "unread": 8,
+   "stubs": [
+    {
+     "thread_id": "T-3",
+     "root_seq": 3,
+     "count": 0,
+     "last_ts": 1794000060.0,
+     "participants": [
+      "L-3c4ed7b0",
+      "L-1481a214",
+      "L-df2af15a"
+     ]
+    },
+    {
+     "thread_id": "T-28",
+     "root_seq": 28,
+     "count": 6,
+     "last_ts": 1794001320.0,
+     "participants": [
+      "L-1481a214",
+      "L-3c4ed7b0",
+      "L-df2af15a"
+     ]
+    }
+   ],
+   "held": []
+  }
+ ],
+ "entries": {
+  "G-53099458": [
+   {
+    "v": 1,
+    "seq": 1,
+    "ts": 1794000000.0,
+    "type": "channel/opened",
+    "by": "owner",
+    "data": {
+     "kind": "group",
+     "title": "share-api-v2",
+     "members": [
+      "L-1481a214",
+      "L-3c4ed7b0",
+      "L-df2af15a"
+     ],
+     "people": [
+      "owner"
+     ],
+     "creator": "owner",
+     "managers": [
+      "L-1481a214"
+     ],
+     "bar_raiser": "default"
+    }
+   },
+   {
+    "v": 1,
+    "seq": 2,
+    "ts": 1794000005.0,
+    "type": "message/posted",
+    "by": "owner",
+    "data": {
+     "msg_id": "M-f6b4de01",
+     "thread_id": null,
+     "text": "Share API v2 has to line up across api, web and docs. Settle it in a meeting.",
+     "kind": "message",
+     "mentions": [],
+     "cc": [],
+     "everyone": false,
+     "also_main": false,
+     "reply_to": null,
+     "answers": null,
+     "chain": {
+      "thread_id": null,
+      "root_seq": 0,
+      "hops": 0,
+      "br_resets": 0
+     }
+    }
+   },
+   {
+    "v": 1,
+    "seq": 3,
+    "ts": 1794000060.0,
+    "type": "message/posted",
+    "by": "lead:L-3c4ed7b0",
+    "data": {
+     "msg_id": "M-1214344b",
+     "thread_id": null,
+     "text": "Meeting: Release order · 1 agenda item · invited tm-demo-api-lead, tm-demo-docs-lead",
+     "kind": "message",
+     "mentions": [],
+     "cc": [],
+     "everyone": false,
+     "also_main": false,
+     "reply_to": null,
+     "answers": null,
+     "chain": {
+      "thread_id": null,
+      "root_seq": 2,
+      "hops": 1,
+      "br_resets": 0
+     }
+    }
+   },
+   {
+    "v": 1,
+    "seq": 4,
+    "ts": 1794000060.0,
+    "type": "thread/opened",
+    "by": "lead:L-3c4ed7b0",
+    "data": {
+     "thread_id": "T-3",
+     "root_seq": 3,
+     "opener": "L-3c4ed7b0",
+     "mode": "meeting",
+     "meeting_id": "MT-b7147bd0"
+    }
+   },
+   {
+    "v": 1,
+    "seq": 5,
+    "ts": 1794000060.0,
+    "type": "thread/member_added",
+    "by": "app",
+    "data": {
+     "thread_id": "T-3",
+     "who": "L-3c4ed7b0",
+     "via": "meeting"
+    }
+   },
+   {
+    "v": 1,
+    "seq": 6,
+    "ts": 1794000060.0,
+    "type": "meeting/convened",
+    "by": "lead:L-3c4ed7b0",
+    "data": {
+     "meeting_id": "MT-b7147bd0",
+     "channel_id": "G-53099458",
+     "thread_id": "T-3",
+     "root_seq": 3,
+     "convener": "L-3c4ed7b0",
+     "chair": "none",
+     "title": "Release order",
+     "purpose": "",
+     "agenda": [
+      {
+       "item_id": "I1",
+       "title": "Who ships first",
+       "question": "api or web first?",
+       "owner": "L-3c4ed7b0",
+       "mode": "vote_first",
+       "options": [
+        "api first",
+        "web first"
+       ],
+       "major": false
+      }
+     ],
+     "invitees": [
+      "L-1481a214",
+      "L-df2af15a"
+     ],
+     "budgets": {
+      "turns": 12,
+      "minutes": 90,
+      "rounds": 3,
+      "seats": 6
+     },
+     "respond_by": 1794001860.0,
+     "minutes_to_main": true,
+     "names": {
+      "L-3c4ed7b0": "tm-demo-web-lead",
+      "L-1481a214": "tm-demo-api-lead",
+      "L-df2af15a": "tm-demo-docs-lead"
+     }
+    }
+   },
+   {
+    "v": 1,
+    "seq": 7,
+    "ts": 1794000060.0,
+    "type": "meeting/invited",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-b7147bd0",
+     "thread_id": "T-3",
+     "to": "L-1481a214",
+     "name": "tm-demo-api-lead",
+     "title": "Release order",
+     "respond_by": 1794001860.0
+    }
+   },
+   {
+    "v": 1,
+    "seq": 8,
+    "ts": 1794000060.0,
+    "type": "meeting/invited",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-b7147bd0",
+     "thread_id": "T-3",
+     "to": "L-df2af15a",
+     "name": "tm-demo-docs-lead",
+     "title": "Release order",
+     "respond_by": 1794001860.0
+    }
+   },
+   {
+    "v": 1,
+    "seq": 9,
+    "ts": 1794000080.0,
+    "type": "meeting/responded",
+    "by": "lead:L-1481a214",
+    "data": {
+     "meeting_id": "MT-b7147bd0",
+     "thread_id": "T-3",
+     "who": "L-1481a214",
+     "answer": "accept",
+     "note": ""
+    }
+   },
+   {
+    "v": 1,
+    "seq": 10,
+    "ts": 1794000080.0,
+    "type": "thread/member_added",
+    "by": "app",
+    "data": {
+     "thread_id": "T-3",
+     "who": "L-1481a214",
+     "via": "meeting"
+    }
+   },
+   {
+    "v": 1,
+    "seq": 11,
+    "ts": 1794000090.0,
+    "type": "meeting/responded",
+    "by": "lead:L-df2af15a",
+    "data": {
+     "meeting_id": "MT-b7147bd0",
+     "thread_id": "T-3",
+     "who": "L-df2af15a",
+     "answer": "accept",
+     "note": ""
+    }
+   },
+   {
+    "v": 1,
+    "seq": 12,
+    "ts": 1794000090.0,
+    "type": "thread/member_added",
+    "by": "app",
+    "data": {
+     "thread_id": "T-3",
+     "who": "L-df2af15a",
+     "via": "meeting"
+    }
+   },
+   {
+    "v": 1,
+    "seq": 13,
+    "ts": 1794000090.0,
+    "type": "meeting/opened",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-b7147bd0",
+     "thread_id": "T-3",
+     "speakers": [
+      "L-3c4ed7b0",
+      "L-1481a214",
+      "L-df2af15a"
+     ],
+     "no_answer": [],
+     "plan_at": 13
+    }
+   },
+   {
+    "v": 1,
+    "seq": 14,
+    "ts": 1794000090.0,
+    "type": "agenda/item_opened",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-b7147bd0",
+     "thread_id": "T-3",
+     "item_id": "I1",
+     "title": "Who ships first",
+     "plan_at": 14
+    }
+   },
+   {
+    "v": 1,
+    "seq": 15,
+    "ts": 1794000090.0,
+    "type": "ballot/opened",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-b7147bd0",
+     "thread_id": "T-3",
+     "item_id": "I1",
+     "ballot_id": "I1-B1",
+     "options": [
+      "api first",
+      "web first"
+     ],
+     "round": 0,
+     "closes_at": 1794000690.0,
+     "plan_at": 15
+    }
+   },
+   {
+    "v": 1,
+    "seq": 16,
+    "ts": 1794000100.0,
+    "type": "action/proposed",
+    "by": "lead:L-3c4ed7b0",
+    "data": {
+     "meeting_id": "MT-b7147bd0",
+     "thread_id": "T-3",
+     "action_id": "AI-1956a3e6",
+     "item_id": "I1",
+     "to": "L-1481a214",
+     "by": "L-3c4ed7b0",
+     "title": "Merge the flag-off API to main",
+     "detail": "",
+     "due": "Tue"
+    }
+   },
+   {
+    "v": 1,
+    "seq": 17,
+    "ts": 1794000110.0,
+    "type": "action/accepted",
+    "by": "lead:L-1481a214",
+    "data": {
+     "meeting_id": "MT-b7147bd0",
+     "thread_id": "T-3",
+     "action_id": "AI-1956a3e6",
+     "todo_ref": "TD-994ce432"
+    }
+   },
+   {
+    "v": 1,
+    "seq": 18,
+    "ts": 1794000120.0,
+    "type": "ballot/cast",
+    "by": "lead:L-1481a214",
+    "data": {
+     "meeting_id": "MT-b7147bd0",
+     "thread_id": "T-3",
+     "item_id": "I1",
+     "ballot_id": "I1-B1",
+     "voter": "L-1481a214",
+     "choice": "api first",
+     "reason": "The API is behind a flag already.",
+     "evidence": [
+      "PR #412"
+     ]
+    }
+   },
+   {
+    "v": 1,
+    "seq": 19,
+    "ts": 1794000130.0,
+    "type": "ballot/cast",
+    "by": "lead:L-3c4ed7b0",
+    "data": {
+     "meeting_id": "MT-b7147bd0",
+     "thread_id": "T-3",
+     "item_id": "I1",
+     "ballot_id": "I1-B1",
+     "voter": "L-3c4ed7b0",
+     "choice": "api first",
+     "reason": "Web needs the new field to exist.",
+     "evidence": []
+    }
+   },
+   {
+    "v": 1,
+    "seq": 20,
+    "ts": 1794000140.0,
+    "type": "ballot/cast",
+    "by": "lead:L-df2af15a",
+    "data": {
+     "meeting_id": "MT-b7147bd0",
+     "thread_id": "T-3",
+     "item_id": "I1",
+     "ballot_id": "I1-B1",
+     "voter": "L-df2af15a",
+     "choice": "web first",
+     "reason": "Docs screenshots come from web.",
+     "evidence": []
+    }
+   },
+   {
+    "v": 1,
+    "seq": 21,
+    "ts": 1794000140.0,
+    "type": "ballot/closed",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-b7147bd0",
+     "thread_id": "T-3",
+     "item_id": "I1",
+     "ballot_id": "I1-B1",
+     "tally": {
+      "api first": 2,
+      "web first": 1
+     },
+     "winner": "api first",
+     "tie": [],
+     "plan_at": 21
+    }
+   },
+   {
+    "v": 1,
+    "seq": 22,
+    "ts": 1794000140.0,
+    "type": "outcome/recorded",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-b7147bd0",
+     "thread_id": "T-3",
+     "item_id": "I1",
+     "kind": "vote",
+     "by": "planner",
+     "text": "api first",
+     "ballot_id": "I1-B1",
+     "tally": {
+      "api first": 2,
+      "web first": 1
+     },
+     "plan_at": 21
+    }
+   },
+   {
+    "v": 1,
+    "seq": 23,
+    "ts": 1794000140.0,
+    "type": "agenda/item_closed",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-b7147bd0",
+     "thread_id": "T-3",
+     "item_id": "I1",
+     "outcome": "vote",
+     "plan_at": 21
+    }
+   },
+   {
+    "v": 1,
+    "seq": 24,
+    "ts": 1794000140.0,
+    "type": "meeting/adjourned",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-b7147bd0",
+     "thread_id": "T-3",
+     "reason": "agenda_done",
+     "by": "planner",
+     "plan_at": 24
+    }
+   },
+   {
+    "v": 1,
+    "seq": 25,
+    "ts": 1794000140.0,
+    "type": "minutes/sealed",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-b7147bd0",
+     "thread_id": "T-3",
+     "minutes": {
+      "meeting_id": "MT-b7147bd0",
+      "title": "Release order",
+      "purpose": "",
+      "convener": "L-3c4ed7b0",
+      "chair": "none",
+      "names": {
+       "L-3c4ed7b0": "tm-demo-web-lead",
+       "L-1481a214": "tm-demo-api-lead",
+       "L-df2af15a": "tm-demo-docs-lead"
+      },
+      "attendees": {
+       "accepted": [
+        "L-3c4ed7b0",
+        "L-1481a214",
+        "L-df2af15a"
+       ],
+       "declined": [],
+       "no_answer": []
+      },
+      "opened_ts": 1794000090.0,
+      "adjourned_ts": 1794000140.0,
+      "adjourn_reason": "agenda_done",
+      "open_minutes": 0.8,
+      "budget": {
+       "turns": [
+        0,
+        12
+       ],
+       "minutes": [
+        0.8,
+        90
+       ],
+       "items": [
+        1,
+        6
+       ],
+       "rounds_per_item": 3,
+       "continues": [
+        0,
+        5
+       ]
+      },
+      "items": [
+       {
+        "item_id": "I1",
+        "title": "Who ships first",
+        "question": "api or web first?",
+        "outcome": {
+         "kind": "vote",
+         "by": "planner",
+         "text": "api first",
+         "rationale": null,
+         "proposal_id": null,
+         "ballot_id": "I1-B1",
+         "case_id": null
+        },
+        "proposal": null,
+        "stances": null,
+        "proposals": [],
+        "ballots": [
+         {
+          "ballot_id": "I1-B1",
+          "options": [
+           "api first",
+           "web first"
+          ],
+          "tally": {
+           "api first": 2,
+           "web first": 1
+          },
+          "winner": "api first",
+          "tie": [],
+          "votes": [
+           {
+            "who": "L-1481a214",
+            "choice": "api first",
+            "reason": "The API is behind a flag already.",
+            "evidence": [
+             "PR #412"
+            ]
+           },
+           {
+            "who": "L-3c4ed7b0",
+            "choice": "api first",
+            "reason": "Web needs the new field to exist.",
+            "evidence": []
+           },
+           {
+            "who": "L-df2af15a",
+            "choice": "web first",
+            "reason": "Docs screenshots come from web.",
+            "evidence": []
+           }
+          ]
+         }
+        ],
+        "dissent": [],
+        "person": [],
+        "asked_person": [],
+        "bar_raiser": [],
+        "rounds": 0
+       }
+      ],
+      "actions": [
+       {
+        "action_id": "AI-1956a3e6",
+        "owner": "L-1481a214",
+        "by": "L-3c4ed7b0",
+        "title": "Merge the flag-off API to main",
+        "due": "Tue",
+        "item_id": "I1",
+        "state": "accepted",
+        "reason": ""
+       }
+      ],
+      "source": "Built by the server from the ledger, not written by any bot."
+     },
+     "digest": "dcba75213c1e011f4b0e3eb6ec00de2c24327fb5befd10007caeaeb88f5c2e94",
+     "plan_at": 25
+    }
+   },
+   {
+    "v": 1,
+    "seq": 26,
+    "ts": 1794000140.0,
+    "type": "meeting/closed",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-b7147bd0",
+     "thread_id": "T-3",
+     "plan_at": 25
+    }
+   },
+   {
+    "v": 1,
+    "seq": 27,
+    "ts": 1794000140.0,
+    "type": "message/posted",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-b7147bd0",
+     "thread_id": null,
+     "msg_id": "M-67f8ef26",
+     "text": "Minutes: Release order\nConvener: tm-demo-web-lead · Chair: none\nAttended: tm-demo-web-lead, tm-demo-api-lead, tm-demo-docs-lead\nOpen 0.8 of 90 min · turns 0/12 · adjourned: agenda_done\n1. Who ships first — Vote: api first\n   Vote api first 2, web first 1\n     tm-demo-api-lead → api first: The API is behind a flag already.\n     tm-demo-web-lead → api first: Web needs the new field to exist.\n     tm-demo-docs-lead → web first: Docs screenshots come from web.\nAction items:\n- tm-demo-api-lead: Merge the flag-off API to main (due Tue) — accepted\nBuilt by the server from the ledger, not written by any bot.",
+     "kind": "minutes",
+     "minutes_of": "MT-b7147bd0",
+     "mentions": [],
+     "cc": [],
+     "everyone": false,
+     "also_main": false,
+     "reply_to": null,
+     "answers": null,
+     "chain": null,
+     "plan_at": 25
+    }
+   },
+   {
+    "v": 1,
+    "seq": 28,
+    "ts": 1794000900.0,
+    "type": "message/posted",
+    "by": "lead:L-1481a214",
+    "data": {
+     "msg_id": "M-ba30d1c7",
+     "thread_id": null,
+     "text": "Meeting: Share API v2 alignment · 3 agenda items · invited tm-demo-web-lead, tm-demo-docs-lead",
+     "kind": "message",
+     "mentions": [],
+     "cc": [],
+     "everyone": false,
+     "also_main": false,
+     "reply_to": null,
+     "answers": null,
+     "chain": {
+      "thread_id": null,
+      "root_seq": 2,
+      "hops": 2,
+      "br_resets": 0
+     }
+    }
+   },
+   {
+    "v": 1,
+    "seq": 29,
+    "ts": 1794000900.0,
+    "type": "thread/opened",
+    "by": "lead:L-1481a214",
+    "data": {
+     "thread_id": "T-28",
+     "root_seq": 28,
+     "opener": "L-1481a214",
+     "mode": "meeting",
+     "meeting_id": "MT-847bdf0c"
+    }
+   },
+   {
+    "v": 1,
+    "seq": 30,
+    "ts": 1794000900.0,
+    "type": "thread/member_added",
+    "by": "app",
+    "data": {
+     "thread_id": "T-28",
+     "who": "L-1481a214",
+     "via": "meeting"
+    }
+   },
+   {
+    "v": 1,
+    "seq": 31,
+    "ts": 1794000900.0,
+    "type": "meeting/convened",
+    "by": "lead:L-1481a214",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "channel_id": "G-53099458",
+     "thread_id": "T-28",
+     "root_seq": 28,
+     "convener": "L-1481a214",
+     "chair": "L-1481a214",
+     "title": "Share API v2 alignment",
+     "purpose": "One response shape for Share API v2 across api, web and docs.",
+     "agenda": [
+      {
+       "item_id": "I1",
+       "title": "expires_at format",
+       "question": "ISO 8601 string or epoch seconds?",
+       "owner": "L-1481a214",
+       "mode": "discuss",
+       "options": [],
+       "major": false
+      },
+      {
+       "item_id": "I2",
+       "title": "Dual-write the old field?",
+       "question": "",
+       "owner": "L-1481a214",
+       "mode": "vote_first",
+       "options": [
+        "No dual-write",
+        "Dual-write 2 weeks"
+       ],
+       "major": false
+      },
+      {
+       "item_id": "I3",
+       "title": "Ship date",
+       "question": "Tuesday or after docs land?",
+       "owner": "L-df2af15a",
+       "mode": "discuss",
+       "options": [],
+       "major": false
+      }
+     ],
+     "invitees": [
+      "L-3c4ed7b0",
+      "L-df2af15a"
+     ],
+     "budgets": {
+      "turns": 24,
+      "minutes": 60,
+      "rounds": 3,
+      "seats": 6
+     },
+     "respond_by": 1794002700.0,
+     "minutes_to_main": true,
+     "names": {
+      "L-1481a214": "tm-demo-api-lead",
+      "L-3c4ed7b0": "tm-demo-web-lead",
+      "L-df2af15a": "tm-demo-docs-lead"
+     }
+    }
+   },
+   {
+    "v": 1,
+    "seq": 32,
+    "ts": 1794000900.0,
+    "type": "meeting/invited",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "to": "L-3c4ed7b0",
+     "name": "tm-demo-web-lead",
+     "title": "Share API v2 alignment",
+     "respond_by": 1794002700.0
+    }
+   },
+   {
+    "v": 1,
+    "seq": 33,
+    "ts": 1794000900.0,
+    "type": "meeting/invited",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "to": "L-df2af15a",
+     "name": "tm-demo-docs-lead",
+     "title": "Share API v2 alignment",
+     "respond_by": 1794002700.0
+    }
+   },
+   {
+    "v": 1,
+    "seq": 34,
+    "ts": 1794000930.0,
+    "type": "meeting/responded",
+    "by": "lead:L-3c4ed7b0",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "who": "L-3c4ed7b0",
+     "answer": "accept",
+     "note": ""
+    }
+   },
+   {
+    "v": 1,
+    "seq": 35,
+    "ts": 1794000930.0,
+    "type": "thread/member_added",
+    "by": "app",
+    "data": {
+     "thread_id": "T-28",
+     "who": "L-3c4ed7b0",
+     "via": "meeting"
+    }
+   },
+   {
+    "v": 1,
+    "seq": 36,
+    "ts": 1794000940.0,
+    "type": "meeting/responded",
+    "by": "lead:L-df2af15a",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "who": "L-df2af15a",
+     "answer": "accept",
+     "note": ""
+    }
+   },
+   {
+    "v": 1,
+    "seq": 37,
+    "ts": 1794000940.0,
+    "type": "thread/member_added",
+    "by": "app",
+    "data": {
+     "thread_id": "T-28",
+     "who": "L-df2af15a",
+     "via": "meeting"
+    }
+   },
+   {
+    "v": 1,
+    "seq": 38,
+    "ts": 1794000940.0,
+    "type": "meeting/opened",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "speakers": [
+      "L-1481a214",
+      "L-3c4ed7b0",
+      "L-df2af15a"
+     ],
+     "no_answer": [],
+     "plan_at": 38
+    }
+   },
+   {
+    "v": 1,
+    "seq": 39,
+    "ts": 1794000940.0,
+    "type": "agenda/item_opened",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I1",
+     "title": "expires_at format",
+     "plan_at": 39
+    }
+   },
+   {
+    "v": 1,
+    "seq": 40,
+    "ts": 1794000940.0,
+    "type": "agenda/round_started",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I1",
+     "round": 1,
+     "queue": [
+      "L-1481a214",
+      "L-3c4ed7b0",
+      "L-df2af15a"
+     ],
+     "rule": "presenter_then_sealed",
+     "plan_at": 40
+    }
+   },
+   {
+    "v": 1,
+    "seq": 41,
+    "ts": 1794000940.0,
+    "type": "turn/granted",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I1",
+     "round": 1,
+     "to": "L-1481a214",
+     "rule": "presenter",
+     "turn_id": "TU-1854dc4beb54",
+     "expires_at": 1794001540.0,
+     "sealed": false,
+     "title": "Share API v2 alignment",
+     "item_title": "expires_at format",
+     "rounds_cap": 3,
+     "plan_at": 41
+    }
+   },
+   {
+    "v": 1,
+    "seq": 42,
+    "ts": 1794001000.0,
+    "type": "message/posted",
+    "by": "lead:L-1481a214",
+    "data": {
+     "msg_id": "M-e1bbcd46",
+     "thread_id": "T-28",
+     "text": "expires_at becomes an ISO 8601 string in UTC; add a revoked boolean.",
+     "kind": "meeting",
+     "mentions": [],
+     "cc": [],
+     "everyone": false,
+     "also_main": false,
+     "reply_to": null,
+     "answers": null,
+     "chain": null,
+     "meeting": {
+      "meeting_id": "MT-847bdf0c",
+      "item_id": "I1",
+      "round": 1,
+      "turn_id": "TU-1854dc4beb54",
+      "stance": "propose",
+      "proposal_id": "I1-P1",
+      "evidence": [
+       "PR #418",
+       "docs/api/share.md"
+      ],
+      "ask_person": false,
+      "calls": [],
+      "sealed_key": null
+     }
+    }
+   },
+   {
+    "v": 1,
+    "seq": 43,
+    "ts": 1794001000.0,
+    "type": "turn/granted",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I1",
+     "round": 1,
+     "to": "L-3c4ed7b0",
+     "rule": "sealed_round",
+     "turn_id": "TU-c4c137aa95a9",
+     "expires_at": 1794001600.0,
+     "sealed": true,
+     "title": "Share API v2 alignment",
+     "item_title": "expires_at format",
+     "rounds_cap": 3,
+     "plan_at": 43
+    }
+   },
+   {
+    "v": 1,
+    "seq": 44,
+    "ts": 1794001000.0,
+    "type": "turn/granted",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I1",
+     "round": 1,
+     "to": "L-df2af15a",
+     "rule": "sealed_round",
+     "turn_id": "TU-494decb0c836",
+     "expires_at": 1794001600.0,
+     "sealed": true,
+     "title": "Share API v2 alignment",
+     "item_title": "expires_at format",
+     "rounds_cap": 3,
+     "plan_at": 43
+    }
+   },
+   {
+    "v": 1,
+    "seq": 45,
+    "ts": 1794001060.0,
+    "type": "message/posted",
+    "by": "lead:L-3c4ed7b0",
+    "data": {
+     "msg_id": "M-b48ad904",
+     "thread_id": "T-28",
+     "text": "Agree. The dashboard already parses ISO.",
+     "kind": "meeting",
+     "mentions": [],
+     "cc": [],
+     "everyone": false,
+     "also_main": false,
+     "reply_to": null,
+     "answers": null,
+     "chain": null,
+     "meeting": {
+      "meeting_id": "MT-847bdf0c",
+      "item_id": "I1",
+      "round": 1,
+      "turn_id": "TU-c4c137aa95a9",
+      "stance": "agree",
+      "proposal_id": "I1-P1",
+      "evidence": [],
+      "ask_person": false,
+      "calls": [],
+      "sealed_key": "MT-847bdf0c:I1:1"
+     }
+    }
+   },
+   {
+    "v": 1,
+    "seq": 46,
+    "ts": 1794001070.0,
+    "type": "message/posted",
+    "by": "lead:L-df2af15a",
+    "data": {
+     "msg_id": "M-ea277d13",
+     "thread_id": "T-28",
+     "text": "Docs need one sample response before Thursday.",
+     "kind": "meeting",
+     "mentions": [],
+     "cc": [],
+     "everyone": false,
+     "also_main": false,
+     "reply_to": null,
+     "answers": null,
+     "chain": null,
+     "meeting": {
+      "meeting_id": "MT-847bdf0c",
+      "item_id": "I1",
+      "round": 1,
+      "turn_id": "TU-494decb0c836",
+      "stance": "info",
+      "proposal_id": null,
+      "evidence": [],
+      "ask_person": false,
+      "calls": [],
+      "sealed_key": "MT-847bdf0c:I1:1"
+     }
+    }
+   },
+   {
+    "v": 1,
+    "seq": 47,
+    "ts": 1794001070.0,
+    "type": "agenda/round_revealed",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I1",
+     "round": 1,
+     "plan_at": 47
+    }
+   },
+   {
+    "v": 1,
+    "seq": 48,
+    "ts": 1794001070.0,
+    "type": "agenda/round_ended",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I1",
+     "round": 1,
+     "consensus": null,
+     "progress": true,
+     "plan_at": 48
+    }
+   },
+   {
+    "v": 1,
+    "seq": 49,
+    "ts": 1794001070.0,
+    "type": "progress/requested",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I1",
+     "round": 1,
+     "to": "L-1481a214",
+     "deadline": 1794001670.0,
+     "title": "Share API v2 alignment",
+     "item_title": "expires_at format",
+     "plan_at": 48
+    }
+   },
+   {
+    "v": 1,
+    "seq": 50,
+    "ts": 1794001100.0,
+    "type": "progress/checked",
+    "by": "lead:L-1481a214",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I1",
+     "round": 1,
+     "is_item_settled": false,
+     "is_progress_being_made": true,
+     "is_in_loop": false,
+     "prompt_for_next_round": "Does anyone object to ISO + revoked?",
+     "next_speakers": [],
+     "recommend": "continue",
+     "vote_options": [],
+     "reason": ""
+    }
+   },
+   {
+    "v": 1,
+    "seq": 51,
+    "ts": 1794001100.0,
+    "type": "agenda/round_started",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I1",
+     "round": 2,
+     "queue": [
+      "L-1481a214",
+      "L-3c4ed7b0",
+      "L-df2af15a"
+     ],
+     "rule": "not_passed_twice",
+     "plan_at": 51
+    }
+   },
+   {
+    "v": 1,
+    "seq": 52,
+    "ts": 1794001100.0,
+    "type": "agenda/round_decided",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I1",
+     "round": 1,
+     "decision": "next_round",
+     "stalls": 0,
+     "plan_at": 51
+    }
+   },
+   {
+    "v": 1,
+    "seq": 53,
+    "ts": 1794001100.0,
+    "type": "turn/granted",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I1",
+     "round": 2,
+     "to": "L-1481a214",
+     "rule": "not_passed_twice",
+     "turn_id": "TU-11337a5a8430",
+     "expires_at": 1794001700.0,
+     "sealed": false,
+     "title": "Share API v2 alignment",
+     "item_title": "expires_at format",
+     "rounds_cap": 3,
+     "plan_at": 53
+    }
+   },
+   {
+    "v": 1,
+    "seq": 54,
+    "ts": 1794001130.0,
+    "type": "turn/passed",
+    "by": "lead:L-1481a214",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I1",
+     "turn_id": "TU-11337a5a8430",
+     "to": "L-1481a214"
+    }
+   },
+   {
+    "v": 1,
+    "seq": 55,
+    "ts": 1794001130.0,
+    "type": "turn/granted",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I1",
+     "round": 2,
+     "to": "L-3c4ed7b0",
+     "rule": "not_passed_twice",
+     "turn_id": "TU-fd423e12ad13",
+     "expires_at": 1794001730.0,
+     "sealed": false,
+     "title": "Share API v2 alignment",
+     "item_title": "expires_at format",
+     "rounds_cap": 3,
+     "plan_at": 55
+    }
+   },
+   {
+    "v": 1,
+    "seq": 56,
+    "ts": 1794001140.0,
+    "type": "turn/passed",
+    "by": "lead:L-3c4ed7b0",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I1",
+     "turn_id": "TU-fd423e12ad13",
+     "to": "L-3c4ed7b0"
+    }
+   },
+   {
+    "v": 1,
+    "seq": 57,
+    "ts": 1794001140.0,
+    "type": "turn/granted",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I1",
+     "round": 2,
+     "to": "L-df2af15a",
+     "rule": "not_passed_twice",
+     "turn_id": "TU-9ee3f6f26fb6",
+     "expires_at": 1794001740.0,
+     "sealed": false,
+     "title": "Share API v2 alignment",
+     "item_title": "expires_at format",
+     "rounds_cap": 3,
+     "plan_at": 57
+    }
+   },
+   {
+    "v": 1,
+    "seq": 58,
+    "ts": 1794001160.0,
+    "type": "message/posted",
+    "by": "lead:L-df2af15a",
+    "data": {
+     "msg_id": "M-332bd99c",
+     "thread_id": "T-28",
+     "text": "Fine with ISO. I will add the sample.",
+     "kind": "meeting",
+     "mentions": [],
+     "cc": [],
+     "everyone": false,
+     "also_main": false,
+     "reply_to": null,
+     "answers": null,
+     "chain": null,
+     "meeting": {
+      "meeting_id": "MT-847bdf0c",
+      "item_id": "I1",
+      "round": 2,
+      "turn_id": "TU-9ee3f6f26fb6",
+      "stance": "agree",
+      "proposal_id": "I1-P1",
+      "evidence": [],
+      "ask_person": false,
+      "calls": [],
+      "sealed_key": null
+     }
+    }
+   },
+   {
+    "v": 1,
+    "seq": 59,
+    "ts": 1794001160.0,
+    "type": "agenda/round_ended",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I1",
+     "round": 2,
+     "consensus": "I1-P1",
+     "progress": true,
+     "plan_at": 59
+    }
+   },
+   {
+    "v": 1,
+    "seq": 60,
+    "ts": 1794001160.0,
+    "type": "progress/requested",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I1",
+     "round": 2,
+     "to": "L-1481a214",
+     "deadline": 1794001760.0,
+     "title": "Share API v2 alignment",
+     "item_title": "expires_at format",
+     "plan_at": 59
+    }
+   },
+   {
+    "v": 1,
+    "seq": 61,
+    "ts": 1794001180.0,
+    "type": "progress/checked",
+    "by": "lead:L-1481a214",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I1",
+     "round": 2,
+     "is_item_settled": true,
+     "is_progress_being_made": true,
+     "is_in_loop": false,
+     "prompt_for_next_round": "",
+     "next_speakers": [],
+     "recommend": "close",
+     "vote_options": [],
+     "reason": ""
+    }
+   },
+   {
+    "v": 1,
+    "seq": 62,
+    "ts": 1794001180.0,
+    "type": "outcome/recorded",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I1",
+     "kind": "consensus",
+     "by": "planner",
+     "text": "expires_at becomes an ISO 8601 string in UTC; add a revoked boolean.",
+     "proposal_id": "I1-P1",
+     "agree": [
+      "L-1481a214",
+      "L-3c4ed7b0",
+      "L-df2af15a"
+     ],
+     "object": [],
+     "abstain": [],
+     "plan_at": 62
+    }
+   },
+   {
+    "v": 1,
+    "seq": 63,
+    "ts": 1794001180.0,
+    "type": "agenda/item_closed",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I1",
+     "outcome": "consensus",
+     "plan_at": 62
+    }
+   },
+   {
+    "v": 1,
+    "seq": 64,
+    "ts": 1794001180.0,
+    "type": "agenda/round_decided",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I1",
+     "round": 2,
+     "decision": "consensus",
+     "stalls": 0,
+     "plan_at": 62
+    }
+   },
+   {
+    "v": 1,
+    "seq": 65,
+    "ts": 1794001180.0,
+    "type": "agenda/item_opened",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I2",
+     "title": "Dual-write the old field?",
+     "plan_at": 65
+    }
+   },
+   {
+    "v": 1,
+    "seq": 66,
+    "ts": 1794001180.0,
+    "type": "ballot/opened",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I2",
+     "ballot_id": "I2-B1",
+     "options": [
+      "No dual-write",
+      "Dual-write 2 weeks"
+     ],
+     "round": 0,
+     "closes_at": 1794001780.0,
+     "plan_at": 66
+    }
+   },
+   {
+    "v": 1,
+    "seq": 67,
+    "ts": 1794001220.0,
+    "type": "ballot/cast",
+    "by": "lead:L-1481a214",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I2",
+     "ballot_id": "I2-B1",
+     "voter": "L-1481a214",
+     "choice": "No dual-write",
+     "reason": "One shape is simpler to support.",
+     "evidence": [
+      "PR #418"
+     ]
+    }
+   },
+   {
+    "v": 1,
+    "seq": 68,
+    "ts": 1794001230.0,
+    "type": "ballot/cast",
+    "by": "lead:L-3c4ed7b0",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I2",
+     "ballot_id": "I2-B1",
+     "voter": "L-3c4ed7b0",
+     "choice": "Dual-write 2 weeks",
+     "reason": "Old dashboards still read the int.",
+     "evidence": []
+    }
+   },
+   {
+    "v": 1,
+    "seq": 69,
+    "ts": 1794001240.0,
+    "type": "ballot/cast",
+    "by": "lead:L-df2af15a",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I2",
+     "ballot_id": "I2-B1",
+     "voter": "L-df2af15a",
+     "choice": "Dual-write 2 weeks",
+     "reason": "Gives readers time.",
+     "evidence": []
+    }
+   },
+   {
+    "v": 1,
+    "seq": 70,
+    "ts": 1794001240.0,
+    "type": "ballot/closed",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I2",
+     "ballot_id": "I2-B1",
+     "tally": {
+      "No dual-write": 1,
+      "Dual-write 2 weeks": 2
+     },
+     "winner": "Dual-write 2 weeks",
+     "tie": [],
+     "plan_at": 70
+    }
+   },
+   {
+    "v": 1,
+    "seq": 71,
+    "ts": 1794001240.0,
+    "type": "outcome/recorded",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I2",
+     "kind": "vote",
+     "by": "planner",
+     "text": "Dual-write 2 weeks",
+     "ballot_id": "I2-B1",
+     "tally": {
+      "No dual-write": 1,
+      "Dual-write 2 weeks": 2
+     },
+     "plan_at": 70
+    }
+   },
+   {
+    "v": 1,
+    "seq": 72,
+    "ts": 1794001240.0,
+    "type": "agenda/item_closed",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I2",
+     "outcome": "vote",
+     "plan_at": 70
+    }
+   },
+   {
+    "v": 1,
+    "seq": 73,
+    "ts": 1794001240.0,
+    "type": "agenda/item_opened",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I3",
+     "title": "Ship date",
+     "plan_at": 73
+    }
+   },
+   {
+    "v": 1,
+    "seq": 74,
+    "ts": 1794001240.0,
+    "type": "agenda/round_started",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I3",
+     "round": 1,
+     "queue": [
+      "L-df2af15a",
+      "L-1481a214",
+      "L-3c4ed7b0"
+     ],
+     "rule": "presenter_then_sealed",
+     "plan_at": 74
+    }
+   },
+   {
+    "v": 1,
+    "seq": 75,
+    "ts": 1794001240.0,
+    "type": "turn/granted",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I3",
+     "round": 1,
+     "to": "L-df2af15a",
+     "rule": "presenter",
+     "turn_id": "TU-9a3822f288f0",
+     "expires_at": 1794001840.0,
+     "sealed": false,
+     "title": "Share API v2 alignment",
+     "item_title": "Ship date",
+     "rounds_cap": 3,
+     "plan_at": 75
+    }
+   },
+   {
+    "v": 1,
+    "seq": 76,
+    "ts": 1794001260.0,
+    "type": "action/proposed",
+    "by": "lead:L-df2af15a",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "action_id": "AI-fcad3c4e",
+     "item_id": "I3",
+     "to": "L-df2af15a",
+     "by": "L-df2af15a",
+     "title": "Publish a sample Share API v2 response",
+     "detail": "",
+     "due": "Thu 18:00"
+    }
+   },
+   {
+    "v": 1,
+    "seq": 77,
+    "ts": 1794001260.0,
+    "type": "action/accepted",
+    "by": "lead:L-df2af15a",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "action_id": "AI-fcad3c4e",
+     "todo_ref": "TD-9bdd8a50"
+    }
+   },
+   {
+    "v": 1,
+    "seq": 78,
+    "ts": 1794001270.0,
+    "type": "action/proposed",
+    "by": "lead:L-1481a214",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "action_id": "AI-8d720a6b",
+     "item_id": "I3",
+     "to": "L-3c4ed7b0",
+     "by": "L-1481a214",
+     "title": "Drop the int field after two weeks",
+     "detail": "",
+     "due": "in 2 weeks"
+    }
+   },
+   {
+    "v": 1,
+    "seq": 79,
+    "ts": 1794001300.0,
+    "type": "message/posted",
+    "by": "lead:L-df2af15a",
+    "data": {
+     "msg_id": "M-9c326525",
+     "thread_id": "T-28",
+     "text": "Ship Tuesday; docs land the sample first.",
+     "kind": "meeting",
+     "mentions": [],
+     "cc": [],
+     "everyone": false,
+     "also_main": false,
+     "reply_to": null,
+     "answers": null,
+     "chain": null,
+     "meeting": {
+      "meeting_id": "MT-847bdf0c",
+      "item_id": "I3",
+      "round": 1,
+      "turn_id": "TU-9a3822f288f0",
+      "stance": "propose",
+      "proposal_id": "I3-P1",
+      "evidence": [
+       "docs PR #77"
+      ],
+      "ask_person": false,
+      "calls": [],
+      "sealed_key": null
+     }
+    }
+   },
+   {
+    "v": 1,
+    "seq": 80,
+    "ts": 1794001300.0,
+    "type": "turn/granted",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I3",
+     "round": 1,
+     "to": "L-1481a214",
+     "rule": "sealed_round",
+     "turn_id": "TU-a0a4a342e141",
+     "expires_at": 1794001900.0,
+     "sealed": true,
+     "title": "Share API v2 alignment",
+     "item_title": "Ship date",
+     "rounds_cap": 3,
+     "plan_at": 80
+    }
+   },
+   {
+    "v": 1,
+    "seq": 81,
+    "ts": 1794001300.0,
+    "type": "turn/granted",
+    "by": "app",
+    "data": {
+     "meeting_id": "MT-847bdf0c",
+     "thread_id": "T-28",
+     "item_id": "I3",
+     "round": 1,
+     "to": "L-3c4ed7b0",
+     "rule": "sealed_round",
+     "turn_id": "TU-e7946a247aa3",
+     "expires_at": 1794001900.0,
+     "sealed": true,
+     "title": "Share API v2 alignment",
+     "item_title": "Ship date",
+     "rounds_cap": 3,
+     "plan_at": 80
+    }
+   },
+   {
+    "v": 1,
+    "seq": 82,
+    "ts": 1794001320.0,
+    "type": "message/posted",
+    "by": "lead:L-1481a214",
+    "data": {
+     "msg_id": "M-ee1549d9",
+     "thread_id": "T-28",
+     "text": "Tuesday works.",
+     "kind": "meeting",
+     "mentions": [],
+     "cc": [],
+     "everyone": false,
+     "also_main": false,
+     "reply_to": null,
+     "answers": null,
+     "chain": null,
+     "meeting": {
+      "meeting_id": "MT-847bdf0c",
+      "item_id": "I3",
+      "round": 1,
+      "turn_id": "TU-a0a4a342e141",
+      "stance": "agree",
+      "proposal_id": "I3-P1",
+      "evidence": [],
+      "ask_person": false,
+      "calls": [],
+      "sealed_key": "MT-847bdf0c:I3:1"
+     }
+    }
+   }
+  ]
+ },
+ "cases": [],
+ "briefs": [],
+ "budget": {
+  "deliveries": {
+   "used": 0,
+   "cap": 200
+  },
+  "wakes_hour": {
+   "used": 0,
+   "cap": 60
+  },
+  "lead_wakes_hour": {
+   "cap": 12
+  },
+  "secretary_hour": {
+   "used": 0,
+   "cap": 60
+  },
+  "cases_hour": {
+   "used": 0,
+   "cap": 6
+  },
+  "messages_hour": {
+   "used": 9,
+   "cap": 200
+  },
+  "tokens_est": {
+   "total": 0,
+   "cap": 2000000,
+   "hot": 0,
+   "cold": 0,
+   "hot_each": 45000,
+   "cold_each": 96000
+  }
+ },
+ "meetings": [
+  {
+   "meeting_id": "MT-b7147bd0",
+   "channel_id": "G-53099458",
+   "thread_id": "T-3",
+   "root_seq": 3,
+   "title": "Release order",
+   "purpose": "",
+   "state": "closed",
+   "convener": "L-3c4ed7b0",
+   "chair": "none",
+   "speakers": [
+    "L-3c4ed7b0",
+    "L-1481a214",
+    "L-df2af15a"
+   ],
+   "invitees": {
+    "L-1481a214": {
+     "state": "accepted",
+     "note": "",
+     "seq": 7
+    },
+    "L-df2af15a": {
+     "state": "accepted",
+     "note": "",
+     "seq": 8
+    }
+   },
+   "names": {
+    "L-3c4ed7b0": "tm-demo-web-lead",
+    "L-1481a214": "tm-demo-api-lead",
+    "L-df2af15a": "tm-demo-docs-lead"
+   },
+   "current": null,
+   "budgets": {
+    "turns": 12,
+    "minutes": 90,
+    "rounds": 3,
+    "seats": 6
+   },
+   "turns_used": 0,
+   "continues_used": 0,
+   "opened_ts": 1794000090.0,
+   "adjourned_ts": 1794000140.0,
+   "closed_ts": 1794000140.0,
+   "adjourn_reason": "agenda_done",
+   "cancel_reason": "",
+   "elapsed_secs": 50.0,
+   "respond_by": 1794001860.0,
+   "bar_raiser": {
+    "cases": 0,
+    "cap": 6,
+    "pending": false,
+    "waiting_person": false
+   },
+   "agenda": [
+    {
+     "item_id": "I1",
+     "title": "Who ships first",
+     "question": "api or web first?",
+     "owner": "L-3c4ed7b0",
+     "mode": "vote_first",
+     "options": [
+      "api first",
+      "web first"
+     ],
+     "major": false,
+     "state": "closed",
+     "opened_seq": 14,
+     "opened_ts": 1794000090.0,
+     "round": 0,
+     "rounds": {},
+     "proposals": {},
+     "latest": {},
+     "speeches": [],
+     "extra_rounds": 0,
+     "stalls": 0,
+     "ballots": {
+      "I1-B1": {
+       "ballot_id": "I1-B1",
+       "options": [
+        "api first",
+        "web first"
+       ],
+       "round": 0,
+       "closes_at": 1794000690.0,
+       "votes": {
+        "L-1481a214": {
+         "choice": "api first",
+         "reason": "The API is behind a flag already.",
+         "evidence": [
+          "PR #412"
+         ],
+         "seq": 18
+        },
+        "L-3c4ed7b0": {
+         "choice": "api first",
+         "reason": "Web needs the new field to exist.",
+         "evidence": [],
+         "seq": 19
+        },
+        "L-df2af15a": {
+         "choice": "web first",
+         "reason": "Docs screenshots come from web.",
+         "evidence": [],
+         "seq": 20
+        }
+       },
+       "state": "closed",
+       "tally": {
+        "api first": 2,
+        "web first": 1
+       },
+       "winner": "api first",
+       "tie": []
+      }
+     },
+     "ballot_open": null,
+     "br_needed": [],
+     "br_acted": [],
+     "br_used": 0,
+     "br_log": [],
+     "br_requested_by": [],
+     "waiting": null,
+     "outcome": {
+      "item_id": "I1",
+      "kind": "vote",
+      "by": "planner",
+      "text": "api first",
+      "ballot_id": "I1-B1",
+      "tally": {
+       "api first": 2,
+       "web first": 1
+      },
+      "seq": 22
+     },
+     "person": [],
+     "person_pending": [],
+     "owner_named": []
+    }
+   ],
+   "actions": [
+    {
+     "action_id": "AI-1956a3e6",
+     "item_id": "I1",
+     "owner": "L-1481a214",
+     "by": "L-3c4ed7b0",
+     "title": "Merge the flag-off API to main",
+     "detail": "",
+     "due": "Tue",
+     "state": "accepted",
+     "reason": "",
+     "seq": 16,
+     "todo_ref": "TD-994ce432"
+    }
+   ],
+   "minutes": {
+    "seq": 25,
+    "meeting_id": "MT-b7147bd0",
+    "title": "Release order",
+    "purpose": "",
+    "convener": "L-3c4ed7b0",
+    "chair": "none",
+    "names": {
+     "L-3c4ed7b0": "tm-demo-web-lead",
+     "L-1481a214": "tm-demo-api-lead",
+     "L-df2af15a": "tm-demo-docs-lead"
+    },
+    "attendees": {
+     "accepted": [
+      "L-3c4ed7b0",
+      "L-1481a214",
+      "L-df2af15a"
+     ],
+     "declined": [],
+     "no_answer": []
+    },
+    "opened_ts": 1794000090.0,
+    "adjourned_ts": 1794000140.0,
+    "adjourn_reason": "agenda_done",
+    "open_minutes": 0.8,
+    "budget": {
+     "turns": [
+      0,
+      12
+     ],
+     "minutes": [
+      0.8,
+      90
+     ],
+     "items": [
+      1,
+      6
+     ],
+     "rounds_per_item": 3,
+     "continues": [
+      0,
+      5
+     ]
+    },
+    "items": [
+     {
+      "item_id": "I1",
+      "title": "Who ships first",
+      "question": "api or web first?",
+      "outcome": {
+       "kind": "vote",
+       "by": "planner",
+       "text": "api first",
+       "rationale": null,
+       "proposal_id": null,
+       "ballot_id": "I1-B1",
+       "case_id": null
+      },
+      "proposal": null,
+      "stances": null,
+      "proposals": [],
+      "ballots": [
+       {
+        "ballot_id": "I1-B1",
+        "options": [
+         "api first",
+         "web first"
+        ],
+        "tally": {
+         "api first": 2,
+         "web first": 1
+        },
+        "winner": "api first",
+        "tie": [],
+        "votes": [
+         {
+          "who": "L-1481a214",
+          "choice": "api first",
+          "reason": "The API is behind a flag already.",
+          "evidence": [
+           "PR #412"
+          ]
+         },
+         {
+          "who": "L-3c4ed7b0",
+          "choice": "api first",
+          "reason": "Web needs the new field to exist.",
+          "evidence": []
+         },
+         {
+          "who": "L-df2af15a",
+          "choice": "web first",
+          "reason": "Docs screenshots come from web.",
+          "evidence": []
+         }
+        ]
+       }
+      ],
+      "dissent": [],
+      "person": [],
+      "asked_person": [],
+      "bar_raiser": [],
+      "rounds": 0
+     }
+    ],
+    "actions": [
+     {
+      "action_id": "AI-1956a3e6",
+      "owner": "L-1481a214",
+      "by": "L-3c4ed7b0",
+      "title": "Merge the flag-off API to main",
+      "due": "Tue",
+      "item_id": "I1",
+      "state": "accepted",
+      "reason": ""
+     }
+    ],
+    "source": "Built by the server from the ledger, not written by any bot."
+   }
+  },
+  {
+   "meeting_id": "MT-847bdf0c",
+   "channel_id": "G-53099458",
+   "thread_id": "T-28",
+   "root_seq": 28,
+   "title": "Share API v2 alignment",
+   "purpose": "One response shape for Share API v2 across api, web and docs.",
+   "state": "open",
+   "convener": "L-1481a214",
+   "chair": "L-1481a214",
+   "speakers": [
+    "L-1481a214",
+    "L-3c4ed7b0",
+    "L-df2af15a"
+   ],
+   "invitees": {
+    "L-3c4ed7b0": {
+     "state": "accepted",
+     "note": "",
+     "seq": 32
+    },
+    "L-df2af15a": {
+     "state": "accepted",
+     "note": "",
+     "seq": 33
+    }
+   },
+   "names": {
+    "L-1481a214": "tm-demo-api-lead",
+    "L-3c4ed7b0": "tm-demo-web-lead",
+    "L-df2af15a": "tm-demo-docs-lead"
+   },
+   "current": "I3",
+   "budgets": {
+    "turns": 24,
+    "minutes": 60,
+    "rounds": 3,
+    "seats": 6
+   },
+   "turns_used": 11,
+   "continues_used": 0,
+   "opened_ts": 1794000940.0,
+   "adjourned_ts": 0.0,
+   "closed_ts": 0.0,
+   "adjourn_reason": "",
+   "cancel_reason": "",
+   "elapsed_secs": 430.0,
+   "respond_by": 1794002700.0,
+   "bar_raiser": {
+    "cases": 0,
+    "cap": 6,
+    "pending": false,
+    "waiting_person": false
+   },
+   "agenda": [
+    {
+     "item_id": "I1",
+     "title": "expires_at format",
+     "question": "ISO 8601 string or epoch seconds?",
+     "owner": "L-1481a214",
+     "mode": "discuss",
+     "options": [],
+     "major": false,
+     "state": "closed",
+     "opened_seq": 39,
+     "opened_ts": 1794000940.0,
+     "round": 2,
+     "rounds": {
+      "1": {
+       "round": 1,
+       "queue": [
+        "L-1481a214",
+        "L-3c4ed7b0",
+        "L-df2af15a"
+       ],
+       "rule": "presenter_then_sealed",
+       "grants": {
+        "TU-1854dc4beb54": {
+         "turn_id": "TU-1854dc4beb54",
+         "speaker": "L-1481a214",
+         "rule": "presenter",
+         "expires_at": 1794001540.0,
+         "sealed": false,
+         "state": "spoke",
+         "seq": 41,
+         "msg_seq": 42
+        },
+        "TU-c4c137aa95a9": {
+         "turn_id": "TU-c4c137aa95a9",
+         "speaker": "L-3c4ed7b0",
+         "rule": "sealed_round",
+         "expires_at": 1794001600.0,
+         "sealed": true,
+         "state": "spoke",
+         "seq": 43,
+         "msg_seq": 45
+        },
+        "TU-494decb0c836": {
+         "turn_id": "TU-494decb0c836",
+         "speaker": "L-df2af15a",
+         "rule": "sealed_round",
+         "expires_at": 1794001600.0,
+         "sealed": true,
+         "state": "spoke",
+         "seq": 44,
+         "msg_seq": 46
+        }
+       },
+       "sealed": true,
+       "revealed": true,
+       "ended": {
+        "consensus": null,
+        "progress": true
+       },
+       "decided": "next_round",
+       "progress_req": {
+        "deadline": 1794001670.0,
+        "seq": 49
+       },
+       "progress": {
+        "round": 1,
+        "is_item_settled": false,
+        "is_progress_being_made": true,
+        "is_in_loop": false,
+        "prompt_for_next_round": "Does anyone object to ISO + revoked?",
+        "next_speakers": [],
+        "recommend": "continue",
+        "vote_options": [],
+        "reason": ""
+       },
+       "calls": []
+      },
+      "2": {
+       "round": 2,
+       "queue": [
+        "L-1481a214",
+        "L-3c4ed7b0",
+        "L-df2af15a"
+       ],
+       "rule": "not_passed_twice",
+       "grants": {
+        "TU-11337a5a8430": {
+         "turn_id": "TU-11337a5a8430",
+         "speaker": "L-1481a214",
+         "rule": "not_passed_twice",
+         "expires_at": 1794001700.0,
+         "sealed": false,
+         "state": "passed",
+         "seq": 53
+        },
+        "TU-fd423e12ad13": {
+         "turn_id": "TU-fd423e12ad13",
+         "speaker": "L-3c4ed7b0",
+         "rule": "not_passed_twice",
+         "expires_at": 1794001730.0,
+         "sealed": false,
+         "state": "passed",
+         "seq": 55
+        },
+        "TU-9ee3f6f26fb6": {
+         "turn_id": "TU-9ee3f6f26fb6",
+         "speaker": "L-df2af15a",
+         "rule": "not_passed_twice",
+         "expires_at": 1794001740.0,
+         "sealed": false,
+         "state": "spoke",
+         "seq": 57,
+         "msg_seq": 58
+        }
+       },
+       "sealed": false,
+       "revealed": false,
+       "ended": {
+        "consensus": "I1-P1",
+        "progress": true
+       },
+       "decided": "consensus",
+       "progress_req": {
+        "deadline": 1794001760.0,
+        "seq": 60
+       },
+       "progress": {
+        "round": 2,
+        "is_item_settled": true,
+        "is_progress_being_made": true,
+        "is_in_loop": false,
+        "prompt_for_next_round": "",
+        "next_speakers": [],
+        "recommend": "close",
+        "vote_options": [],
+        "reason": ""
+       },
+       "calls": []
+      }
+     },
+     "proposals": {
+      "I1-P1": {
+       "proposal_id": "I1-P1",
+       "by": "L-1481a214",
+       "text": "expires_at becomes an ISO 8601 string in UTC; add a revoked boolean.",
+       "seq": 42,
+       "round": 1
+      }
+     },
+     "latest": {
+      "L-1481a214": [
+       "propose",
+       "I1-P1",
+       42
+      ],
+      "L-3c4ed7b0": [
+       "agree",
+       "I1-P1",
+       45
+      ],
+      "L-df2af15a": [
+       "agree",
+       "I1-P1",
+       58
+      ]
+     },
+     "speeches": [
+      {
+       "seq": 42,
+       "ts": 1794001000.0,
+       "by": "L-1481a214",
+       "text": "expires_at becomes an ISO 8601 string in UTC; add a revoked boolean.",
+       "stance": "propose",
+       "proposal_id": "I1-P1",
+       "evidence": [
+        "PR #418",
+        "docs/api/share.md"
+       ],
+       "round": 1,
+       "turn_id": "TU-1854dc4beb54",
+       "sealed_key": null,
+       "ask_person": false,
+       "calls": [],
+       "digest": "fa7f3c6bc467e7ce"
+      },
+      {
+       "seq": 45,
+       "ts": 1794001060.0,
+       "by": "L-3c4ed7b0",
+       "text": "Agree. The dashboard already parses ISO.",
+       "stance": "agree",
+       "proposal_id": "I1-P1",
+       "evidence": [],
+       "round": 1,
+       "turn_id": "TU-c4c137aa95a9",
+       "sealed_key": "MT-847bdf0c:I1:1",
+       "ask_person": false,
+       "calls": [],
+       "digest": "91ee95a19994f64e"
+      },
+      {
+       "seq": 46,
+       "ts": 1794001070.0,
+       "by": "L-df2af15a",
+       "text": "Docs need one sample response before Thursday.",
+       "stance": "info",
+       "proposal_id": null,
+       "evidence": [],
+       "round": 1,
+       "turn_id": "TU-494decb0c836",
+       "sealed_key": "MT-847bdf0c:I1:1",
+       "ask_person": false,
+       "calls": [],
+       "digest": "4ec04539b73a8c4b"
+      },
+      {
+       "seq": 58,
+       "ts": 1794001160.0,
+       "by": "L-df2af15a",
+       "text": "Fine with ISO. I will add the sample.",
+       "stance": "agree",
+       "proposal_id": "I1-P1",
+       "evidence": [],
+       "round": 2,
+       "turn_id": "TU-9ee3f6f26fb6",
+       "sealed_key": null,
+       "ask_person": false,
+       "calls": [],
+       "digest": "b4d602ca3312a4dd"
+      }
+     ],
+     "extra_rounds": 0,
+     "stalls": 0,
+     "ballots": {},
+     "ballot_open": null,
+     "br_needed": [],
+     "br_acted": [],
+     "br_used": 0,
+     "br_log": [],
+     "br_requested_by": [],
+     "waiting": null,
+     "outcome": {
+      "item_id": "I1",
+      "kind": "consensus",
+      "by": "planner",
+      "text": "expires_at becomes an ISO 8601 string in UTC; add a revoked boolean.",
+      "proposal_id": "I1-P1",
+      "agree": [
+       "L-1481a214",
+       "L-3c4ed7b0",
+       "L-df2af15a"
+      ],
+      "object": [],
+      "abstain": [],
+      "seq": 62
+     },
+     "person": [],
+     "person_pending": [],
+     "owner_named": []
+    },
+    {
+     "item_id": "I2",
+     "title": "Dual-write the old field?",
+     "question": "",
+     "owner": "L-1481a214",
+     "mode": "vote_first",
+     "options": [
+      "No dual-write",
+      "Dual-write 2 weeks"
+     ],
+     "major": false,
+     "state": "closed",
+     "opened_seq": 65,
+     "opened_ts": 1794001180.0,
+     "round": 0,
+     "rounds": {},
+     "proposals": {},
+     "latest": {},
+     "speeches": [],
+     "extra_rounds": 0,
+     "stalls": 0,
+     "ballots": {
+      "I2-B1": {
+       "ballot_id": "I2-B1",
+       "options": [
+        "No dual-write",
+        "Dual-write 2 weeks"
+       ],
+       "round": 0,
+       "closes_at": 1794001780.0,
+       "votes": {
+        "L-1481a214": {
+         "choice": "No dual-write",
+         "reason": "One shape is simpler to support.",
+         "evidence": [
+          "PR #418"
+         ],
+         "seq": 67
+        },
+        "L-3c4ed7b0": {
+         "choice": "Dual-write 2 weeks",
+         "reason": "Old dashboards still read the int.",
+         "evidence": [],
+         "seq": 68
+        },
+        "L-df2af15a": {
+         "choice": "Dual-write 2 weeks",
+         "reason": "Gives readers time.",
+         "evidence": [],
+         "seq": 69
+        }
+       },
+       "state": "closed",
+       "tally": {
+        "No dual-write": 1,
+        "Dual-write 2 weeks": 2
+       },
+       "winner": "Dual-write 2 weeks",
+       "tie": []
+      }
+     },
+     "ballot_open": null,
+     "br_needed": [],
+     "br_acted": [],
+     "br_used": 0,
+     "br_log": [],
+     "br_requested_by": [],
+     "waiting": null,
+     "outcome": {
+      "item_id": "I2",
+      "kind": "vote",
+      "by": "planner",
+      "text": "Dual-write 2 weeks",
+      "ballot_id": "I2-B1",
+      "tally": {
+       "No dual-write": 1,
+       "Dual-write 2 weeks": 2
+      },
+      "seq": 71
+     },
+     "person": [],
+     "person_pending": [],
+     "owner_named": []
+    },
+    {
+     "item_id": "I3",
+     "title": "Ship date",
+     "question": "Tuesday or after docs land?",
+     "owner": "L-df2af15a",
+     "mode": "discuss",
+     "options": [],
+     "major": false,
+     "state": "open",
+     "opened_seq": 73,
+     "opened_ts": 1794001240.0,
+     "round": 1,
+     "rounds": {
+      "1": {
+       "round": 1,
+       "queue": [
+        "L-df2af15a",
+        "L-1481a214",
+        "L-3c4ed7b0"
+       ],
+       "rule": "presenter_then_sealed",
+       "grants": {
+        "TU-9a3822f288f0": {
+         "turn_id": "TU-9a3822f288f0",
+         "speaker": "L-df2af15a",
+         "rule": "presenter",
+         "expires_at": 1794001840.0,
+         "sealed": false,
+         "state": "spoke",
+         "seq": 75,
+         "msg_seq": 79
+        },
+        "TU-a0a4a342e141": {
+         "turn_id": "TU-a0a4a342e141",
+         "speaker": "L-1481a214",
+         "rule": "sealed_round",
+         "expires_at": 1794001900.0,
+         "sealed": true,
+         "state": "spoke",
+         "seq": 80,
+         "msg_seq": 82
+        },
+        "TU-e7946a247aa3": {
+         "turn_id": "TU-e7946a247aa3",
+         "speaker": "L-3c4ed7b0",
+         "rule": "sealed_round",
+         "expires_at": 1794001900.0,
+         "sealed": true,
+         "state": "open",
+         "seq": 81
+        }
+       },
+       "sealed": true,
+       "revealed": false,
+       "ended": null,
+       "decided": null,
+       "progress_req": null,
+       "progress": null,
+       "calls": []
+      }
+     },
+     "proposals": {
+      "I3-P1": {
+       "proposal_id": "I3-P1",
+       "by": "L-df2af15a",
+       "text": "Ship Tuesday; docs land the sample first.",
+       "seq": 79,
+       "round": 1
+      }
+     },
+     "latest": {
+      "L-df2af15a": [
+       "propose",
+       "I3-P1",
+       79
+      ],
+      "L-1481a214": [
+       "agree",
+       "I3-P1",
+       82
+      ]
+     },
+     "speeches": [
+      {
+       "seq": 79,
+       "ts": 1794001300.0,
+       "by": "L-df2af15a",
+       "text": "Ship Tuesday; docs land the sample first.",
+       "stance": "propose",
+       "proposal_id": "I3-P1",
+       "evidence": [
+        "docs PR #77"
+       ],
+       "round": 1,
+       "turn_id": "TU-9a3822f288f0",
+       "sealed_key": null,
+       "ask_person": false,
+       "calls": [],
+       "digest": "9aa3374c2e5b42e4"
+      },
+      {
+       "seq": 82,
+       "ts": 1794001320.0,
+       "by": "L-1481a214",
+       "text": "Tuesday works.",
+       "stance": "agree",
+       "proposal_id": "I3-P1",
+       "evidence": [],
+       "round": 1,
+       "turn_id": "TU-a0a4a342e141",
+       "sealed_key": "MT-847bdf0c:I3:1",
+       "ask_person": false,
+       "calls": [],
+       "digest": "f0ac2fdd261da2bb"
+      }
+     ],
+     "extra_rounds": 0,
+     "stalls": 0,
+     "ballots": {},
+     "ballot_open": null,
+     "br_needed": [],
+     "br_acted": [],
+     "br_used": 0,
+     "br_log": [],
+     "br_requested_by": [],
+     "waiting": null,
+     "outcome": null,
+     "person": [],
+     "person_pending": [],
+     "owner_named": []
+    }
+   ],
+   "actions": [
+    {
+     "action_id": "AI-fcad3c4e",
+     "item_id": "I3",
+     "owner": "L-df2af15a",
+     "by": "L-df2af15a",
+     "title": "Publish a sample Share API v2 response",
+     "detail": "",
+     "due": "Thu 18:00",
+     "state": "accepted",
+     "reason": "",
+     "seq": 76,
+     "todo_ref": "TD-9bdd8a50"
+    },
+    {
+     "action_id": "AI-8d720a6b",
+     "item_id": "I3",
+     "owner": "L-3c4ed7b0",
+     "by": "L-1481a214",
+     "title": "Drop the int field after two weeks",
+     "detail": "",
+     "due": "in 2 weeks",
+     "state": "proposed",
+     "reason": "",
+     "seq": 78,
+     "todo_ref": null
+    }
+   ],
+   "minutes": null
+  }
+ ]
+}

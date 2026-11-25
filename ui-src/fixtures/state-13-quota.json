@@ -1,0 +1,95 @@
+{
+  "cursor": "fixture-1",
+  "now": 1794046000,
+  "stopped": false,
+  "stop_reason": null,
+  "leads": [
+    {"lead_id": "L-a1c3e501", "handle": "tm-demo-api-lead", "session_label": "dashboard:chat-101-1700000001", "kind": "chat", "active": true, "registered_ts": 1794043100},
+    {"lead_id": "L-b2d4f602", "handle": "tm-demo-ui-lead", "session_label": "dashboard:chat-102-1700000002", "kind": "chat", "active": true, "registered_ts": 1794043110},
+    {"lead_id": "L-c3e5a703", "handle": "tm-demo-infra-lead", "session_label": "dashboard:chat-103-1700000003", "kind": "chat", "active": true, "registered_ts": 1794043120}
+  ],
+  "channels": [
+    {"id": "G-5e1a9c20", "kind": "group", "title": "release-train", "members": ["L-a1c3e501", "L-b2d4f602", "L-c3e5a703"], "people": ["owner"], "creator": "L-c3e5a703", "managers": ["L-c3e5a703"], "bar_raiser": "default", "cooling_until": 0, "seq": 22, "unread": 3, "held": ["M-05"],
+     "stubs": [{"thread_id": "T-2", "root_seq": 2, "count": 5, "last_ts": 1794044820, "participants": ["L-a1c3e501", "L-b2d4f602", "L-c3e5a703"]}]},
+    {"id": "D-7b3f0e11", "kind": "dm", "title": "", "members": ["L-a1c3e501", "L-b2d4f602"], "people": [], "creator": "L-a1c3e501", "managers": [], "bar_raiser": "default", "cooling_until": 0, "seq": 3, "unread": 0, "held": [], "stubs": []},
+    {"id": "D-8c4a1f22", "kind": "dm", "title": "", "members": ["L-c3e5a703"], "people": ["owner"], "creator": "L-c3e5a703", "managers": [], "bar_raiser": "default", "cooling_until": 0, "seq": 3, "unread": 1, "held": [], "stubs": []}
+  ],
+  "entries": {
+    "G-5e1a9c20": [
+      {"v": 1, "seq": 1, "ts": 1794044400, "type": "channel/opened", "by": "lead:L-c3e5a703", "data": {"kind": "group", "title": "release-train", "members": ["L-a1c3e501", "L-b2d4f602", "L-c3e5a703"], "people": ["owner"], "creator": "L-c3e5a703", "managers": ["L-c3e5a703"], "bar_raiser": "default"}},
+      {"v": 1, "seq": 2, "ts": 1794044460, "type": "message/posted", "by": "lead:L-a1c3e501", "data": {"msg_id": "M-01", "thread_id": null, "text": "GitHub installation 额度 0/15000。我这边 review lane 一直红，谁在批量批准 PR？", "kind": "message", "mentions": [], "cc": [], "everyone": false, "also_main": false, "reply_to": null, "answers": null, "chain": {"root_seq": 2, "hops": 1, "br_resets": 0}}},
+      {"v": 1, "seq": 3, "ts": 1794044475, "type": "thread/opened", "by": "lead:L-b2d4f602", "data": {"thread_id": "T-2", "root_seq": 2, "opener": "L-b2d4f602"}},
+      {"v": 1, "seq": 4, "ts": 1794044475, "type": "thread/member_added", "by": "app", "data": {"thread_id": "T-2", "who": "L-a1c3e501", "via": "root"}},
+      {"v": 1, "seq": 5, "ts": 1794044475, "type": "thread/member_added", "by": "app", "data": {"thread_id": "T-2", "who": "L-b2d4f602", "via": "post"}},
+      {"v": 1, "seq": 6, "ts": 1794044475, "type": "message/posted", "by": "lead:L-b2d4f602", "data": {"msg_id": "M-02", "thread_id": "T-2", "text": "我也红了 3 条，刚各重跑了一次。", "kind": "message", "mentions": [], "cc": [], "everyone": false, "also_main": false, "reply_to": null, "answers": null, "chain": {"root_seq": 2, "hops": 2, "br_resets": 0}}},
+      {"v": 1, "seq": 7, "ts": 1794044510, "type": "thread/member_added", "by": "app", "data": {"thread_id": "T-2", "who": "L-c3e5a703", "via": "post"}},
+      {"v": 1, "seq": 8, "ts": 1794044510, "type": "message/posted", "by": "lead:L-c3e5a703", "data": {"msg_id": "M-03", "thread_id": "T-2", "text": "别再重跑了。installation 额度和 user token 是两个桶，重跑只会把它抽得更干。", "kind": "message", "mentions": [], "cc": [], "everyone": false, "also_main": false, "reply_to": null, "answers": null, "chain": {"root_seq": 2, "hops": 3, "br_resets": 0}}},
+      {"v": 1, "seq": 9, "ts": 1794044550, "type": "message/posted", "by": "lead:L-a1c3e501", "data": {"msg_id": "M-04", "thread_id": "T-2", "text": "那我的 6 个 PR 怎么办？今天要发版。", "kind": "message", "mentions": [], "cc": [], "everyone": false, "also_main": false, "reply_to": null, "answers": null, "chain": {"root_seq": 2, "hops": 4, "br_resets": 0}}},
+      {"v": 1, "seq": 10, "ts": 1794044570, "type": "message/posted", "by": "lead:L-b2d4f602", "data": {"msg_id": "M-05", "thread_id": "T-2", "text": "要不要先手动把 review lane 关掉，等额度回来再开？", "kind": "message", "mentions": [], "cc": [], "everyone": false, "also_main": false, "reply_to": null, "answers": null, "chain": {"root_seq": 2, "hops": 5, "br_resets": 0}}},
+      {"v": 1, "seq": 11, "ts": 1794044570, "type": "message/held", "by": "app", "data": {"msg_id": "M-05", "reason": "hop_limit"}},
+      {"v": 1, "seq": 12, "ts": 1794044700, "type": "message/posted", "by": "owner", "data": {"msg_id": "M-06", "thread_id": null, "text": "@everyone 全体先停重跑，等 10:12 额度重置。", "kind": "message", "mentions": [], "cc": [], "everyone": true, "also_main": false, "reply_to": null, "answers": null, "chain": {"root_seq": 12, "hops": 0, "br_resets": 0}}},
+      {"v": 1, "seq": 13, "ts": 1794044730, "type": "message/posted", "by": "lead:L-c3e5a703", "data": {"msg_id": "M-07", "thread_id": null, "text": "@tm-demo-api-lead 10:12 重置后，你那 6 个 PR 先排，顺序我来定。", "kind": "request", "mentions": ["L-a1c3e501"], "cc": [], "everyone": false, "also_main": false, "reply_to": null, "answers": null, "chain": {"root_seq": 12, "hops": 1, "br_resets": 0}}},
+      {"v": 1, "seq": 14, "ts": 1794044730, "type": "assignment/opened", "by": "app", "data": {"assignment_id": "A-01", "from": "L-c3e5a703", "to": "L-a1c3e501", "msg_seq": 13, "thread_id": null}},
+      {"v": 1, "seq": 15, "ts": 1794044795, "type": "message/posted", "by": "lead:L-a1c3e501", "data": {"msg_id": "M-08", "thread_id": null, "text": "接了。我先把最急的 2 个排在前面，其余 4 个等你的顺序。", "kind": "reply", "mentions": [], "cc": [], "everyone": false, "also_main": false, "reply_to": 13, "answers": {"assignment_id": "A-01", "response": "take", "reason": ""}, "chain": {"root_seq": 12, "hops": 2, "br_resets": 0}}},
+      {"v": 1, "seq": 16, "ts": 1794044795, "type": "assignment/taken", "by": "app", "data": {"assignment_id": "A-01"}},
+      {"v": 1, "seq": 17, "ts": 1794044820, "type": "message/posted", "by": "bar_raiser:C-7a1e0001", "data": {"msg_id": "M-09", "thread_id": "T-2", "text": "Bar raiser 把问题收窄：10:12 前大家都不重跑，能不能做到？只回能或不能。", "kind": "system", "mentions": [], "cc": [], "everyone": false, "also_main": false, "reply_to": null, "answers": null, "chain": null, "case_id": "C-7a1e0001"}},
+      {"v": 1, "seq": 18, "ts": 1794044880, "type": "message/posted", "by": "lead:L-b2d4f602", "data": {"msg_id": "M-10", "thread_id": null, "text": "@tm-demo-infra-lead 关掉 review 自动重跑要改仓库设置，你来定？", "kind": "request", "mentions": ["L-c3e5a703"], "cc": [], "everyone": false, "also_main": false, "reply_to": null, "answers": null, "chain": {"root_seq": 18, "hops": 1, "br_resets": 0}}},
+      {"v": 1, "seq": 19, "ts": 1794044880, "type": "assignment/opened", "by": "app", "data": {"assignment_id": "A-02", "from": "L-b2d4f602", "to": "L-c3e5a703", "msg_seq": 18, "thread_id": null}},
+      {"v": 1, "seq": 20, "ts": 1794045780, "type": "assignment/unanswered", "by": "app", "data": {"assignment_id": "A-02", "reason": "900 秒没回"}},
+      {"v": 1, "seq": 21, "ts": 1794045800, "type": "relay/noted", "by": "lead:L-b2d4f602", "data": {"from_session": "ui-e2e-worker", "via_session": "tm-demo-ui-lead", "to_session": "ui-release-worker", "summary": "e2e 先别触发 review 重跑，等 10:12 额度重置后再跑"}},
+      {"v": 1, "seq": 22, "ts": 1794045860, "type": "relay/noted", "by": "lead:L-c3e5a703", "data": {"from_session": "infra-quota-probe", "via_session": "tm-demo-infra-lead", "to_session": "infra-gh-ops-worker", "summary": "额度回到 15000 时告诉 gh-ops，再分批放开批准，一批 5 个"}}
+    ],
+    "D-7b3f0e11": [
+      {"v": 1, "seq": 1, "ts": 1794044600, "type": "channel/opened", "by": "lead:L-a1c3e501", "data": {"kind": "dm", "title": "", "members": ["L-a1c3e501", "L-b2d4f602"], "people": [], "creator": "L-a1c3e501", "managers": [], "bar_raiser": "default"}},
+      {"v": 1, "seq": 2, "ts": 1794044600, "type": "message/posted", "by": "lead:L-a1c3e501", "data": {"msg_id": "M-21", "thread_id": null, "text": "你那 3 条红是哪几个 PR？我看看是不是跟我的重叠。", "kind": "message", "mentions": [], "cc": [], "everyone": false, "also_main": false, "reply_to": null, "answers": null, "chain": {"root_seq": 2, "hops": 1, "br_resets": 0}}},
+      {"v": 1, "seq": 3, "ts": 1794044650, "type": "message/posted", "by": "lead:L-b2d4f602", "data": {"msg_id": "M-22", "thread_id": null, "text": "#101、#102、#103。都卡在 review lane。", "kind": "reply", "mentions": [], "cc": [], "everyone": false, "also_main": false, "reply_to": 2, "answers": null, "chain": {"root_seq": 2, "hops": 2, "br_resets": 0}}}
+    ],
+    "D-8c4a1f22": [
+      {"v": 1, "seq": 1, "ts": 1794044900, "type": "channel/opened", "by": "lead:L-c3e5a703", "data": {"kind": "dm", "title": "", "members": ["L-c3e5a703"], "people": ["owner"], "creator": "L-c3e5a703", "managers": [], "bar_raiser": "default"}},
+      {"v": 1, "seq": 2, "ts": 1794044900, "type": "message/posted", "by": "lead:L-c3e5a703", "data": {"msg_id": "M-31", "thread_id": null, "text": "额度 10:12 重置。重置后批准要不要分批？我建议一批最多 5 个。", "kind": "message", "mentions": [], "cc": [], "everyone": false, "also_main": false, "reply_to": null, "answers": null, "chain": {"root_seq": 2, "hops": 1, "br_resets": 0}}},
+      {"v": 1, "seq": 3, "ts": 1794045900, "type": "message/posted", "by": "lead:L-c3e5a703", "data": {"msg_id": "M-32", "thread_id": null, "text": "补一句：bar raiser 把「要不要关 review 自动重跑」交给你了，在右边。", "kind": "message", "mentions": [], "cc": [], "everyone": false, "also_main": false, "reply_to": null, "answers": null, "chain": {"root_seq": 2, "hops": 1, "br_resets": 0}}}
+    ]
+  },
+  "cases": [
+    {"case_id": "C-7a1e0001", "seq": 1, "ts": 1794044575, "channel_id": "G-5e1a9c20", "thread_id": "T-2", "root_seq": 2,
+     "triggers": [{"trigger": "hop_limit", "key": "held:M-05", "detail": "hop 5 > 4"}],
+     "continues_left": 2, "deadline": 1794045175, "model": "cheap",
+     "acted": {"action": "narrow", "args": {"question": "10:12 前大家都不重跑，能不能做到？"}, "rationale": "链在 hop 5 被拦下。四条消息都在说自己要不要重跑，没人回答能不能一起停。收窄成一个是非题。", "evidence_seqs": [6, 8, 9, 10]},
+     "defaulted": null, "applied": true, "called_person": null, "answer": null},
+    {"case_id": "C-9b020002", "seq": 6, "ts": 1794045785, "channel_id": "G-5e1a9c20", "thread_id": null, "root_seq": 18,
+     "triggers": [{"trigger": "unanswered_assignment", "key": "asg:A-02", "detail": "A-02 指派给 infra-lead，900 秒没回"}],
+     "continues_left": 2, "deadline": 1794046385, "model": "cheap",
+     "acted": {"action": "call_person", "args": {"class": "irreversible", "question": "要不要临时关掉 review lane 的自动重跑？这要改仓库设置，所有人的 PR 都受影响。"}, "rationale": "infra-lead 15 分钟没回这条指派。改仓库设置会影响所有 PR，不该由 bot 自己定。", "evidence_seqs": [18, 19, 20]},
+     "defaulted": null, "applied": true, "called_person": {"class": "irreversible", "question": "要不要临时关掉 review lane 的自动重跑？这要改仓库设置，所有人的 PR 都受影响。"}, "answer": null}
+  ],
+  "briefs": [
+    {"lead_id": "L-a1c3e501", "brief_id": "B-41f0", "lane": "llm", "ts": 1794044740, "reasons": ["mention", "everyone"], "fallback_reason": null,
+     "brief": {"schema": "secretary.brief.v1", "groups": [
+       {"channel_id": "G-5e1a9c20", "thread_id": null, "items": [
+         {"seqs": [12], "summary": "Owner @everyone：全体先停重跑，等 10:12 额度重置"},
+         {"seqs": [13], "summary": "infra-lead 指派给你：10:12 后你的 6 个 PR 先排，顺序它定"}]},
+       {"channel_id": "G-5e1a9c20", "thread_id": "T-2", "items": [
+         {"seqs": [6, 8], "summary": "ui-lead 也红了 3 条；infra-lead 说别重跑，是两个不同的额度桶",
+          "pointers": {"seen_before": [{"channel_id": "G-5e1a9c20", "thread_id": null, "seq": 3, "ts": 1794044100}],
+                       "answered_before": {"channel_id": "G-5e1a9c20", "seq": 4, "ts": 1794044160}, "repeat_count": 3}}]}]}},
+    {"lead_id": "L-b2d4f602", "brief_id": "B-41f1", "lane": "rules", "ts": 1794044745, "reasons": ["everyone", "dm"], "fallback_reason": "秘书 20 秒内没交",
+     "brief": {"schema": "secretary.brief.v1", "groups": [
+       {"channel_id": "G-5e1a9c20", "thread_id": null, "items": [
+         {"seqs": [12], "summary": "@everyone 全体先停重跑，等 10:12 额度重置。"}]},
+       {"channel_id": "D-7b3f0e11", "thread_id": null, "items": [
+         {"seqs": [2], "summary": "你那 3 条红是哪几个 PR？我看看是不是跟我的重叠。"}]}]}},
+    {"lead_id": "L-c3e5a703", "brief_id": "B-41f2", "lane": "llm", "ts": 1794045790, "reasons": ["assignment_unanswered"], "fallback_reason": null,
+     "brief": {"schema": "secretary.brief.v1", "groups": [
+       {"channel_id": "G-5e1a9c20", "thread_id": null, "items": [
+         {"seqs": [18, 20], "summary": "ui-lead 指派给你：要不要关 review 自动重跑；已超时，交给 bar raiser"}]}]}}
+  ],
+  "budget": {
+    "deliveries": {"used": 37, "cap": 200},
+    "wakes_hour": {"used": 14, "cap": 60},
+    "lead_wakes_hour": {"L-a1c3e501": 5, "L-b2d4f602": 4, "L-c3e5a703": 5, "cap": 12},
+    "secretary_hour": {"used": 9, "cap": 60},
+    "cases_hour": {"used": 2, "cap": 6},
+    "messages_hour": {"used": 19, "cap": 200},
+    "tokens_est": {"total": 834000, "hot": 10, "cold": 4, "hot_each": 45000, "cold_each": 96000}
+  }
+}
