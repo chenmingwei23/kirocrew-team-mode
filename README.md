@@ -48,6 +48,14 @@ mounts it. The server joins a Bot's own chat only when all of these hold:
 3. the owner approved the `tools` Bot scope on the app's detail page;
 4. the owner ticked the Bot under "Bots this app can reach".
 
+A Bot lead is woken through the host's Bot API: `permissions.bots` also declares
+`read` (to find the Bot's id in `GET /api/members`) and `wake`
+(`POST /api/members/{id}/wake` with `{"ref": ...}`). Each `wake/due` the wake loop
+writes for a Bot lead is followed by one wake call, and its result is recorded in the
+lead's member file as `wake/sent` or `wake/refused` (with the host's reason, also
+logged as a warning). The owner approves `read` and `wake` with `tools` on the
+detail page; an unticked Bot is refused `bot_not_ticked`.
+
 The "Answer from its own chat" switch on a Bot's Team Mode tab ticks or unticks
 that one Bot in the same list (`/api/apps/team-mode/bot-grants`). Unticking takes
 the tools off at the start of the chat's next turn. A Bot pinned to the Kiro CLI

@@ -13,13 +13,14 @@ from __future__ import annotations
 
 import asyncio
 import json
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable
 
 from aiohttp import web
 
-from . import identity, ledger, lifecycle, limits, models, send, state, wake
+from . import bot_wake, identity, ledger, lifecycle, limits, models, send, state, wake
 
 MAX_BODY = 64 * 1024
 
@@ -118,54 +119,31 @@ async def _lead_add(request, ctx, root):
         return web.json_response({"status": "refused", "reason": exc.code}, status=409)
     res = {"status": "accepted", "lead_id": lead_id}
     if "bot" in body:
-        res["wake"] = await _arm_bot_wake(ctx, lead_id, body["bot"])
+        res["wake"] = await _bot_wake_ready(ctx, body["bot"])
     return web.json_response(res)
 
 
-def _wake_job_name(lead_id: str) -> str:
-    return f"team-mode-inbox-{lead_id}"
-
-
-async def _arm_bot_wake(ctx: Any, lead_id: str, bot: str) -> str:
-    """Hang the inbox probe on the Bot's own chat (host ``cron.add_job(bot=...)``).
-
-    ``"armed"``, or why not: the host refuses until the owner turns on Team Mode's tools
-    for this Bot (``bot_chat_app_tools``), and an older host has no ``bot=`` at all.
-    Registration stands either way; ``POST /leads/{id}/wake`` arms it later.
-    """
-    cron = getattr(ctx, "cron", None)
-    if cron is None:
-        return "no_cron_permission"
-    name = _wake_job_name(lead_id)
-    if any(getattr(j, "name", "") == name for j in await asyncio.to_thread(cron.list_jobs)):
-        return "armed"
-    try:
-        await cron.add_job_async(name, json.dumps({"lead_id": lead_id}), every_secs=60,
-                                 script="crons/inbox_probe.py:watch", timeout=10, bot=bot)
-    except TypeError:
-        return "host_without_bot_wake"
-    except ValueError as exc:
-        return f"refused: {str(exc)[:160]}"
-    return "armed"
-
-
-async def _disarm_bot_wake(ctx: Any, lead_id: str) -> None:
-    cron = getattr(ctx, "cron", None)
-    if cron is None:
-        return
-    for job in await asyncio.to_thread(cron.list_jobs):
-        if getattr(job, "name", "") == _wake_job_name(lead_id):
-            await cron.remove_job_async(job.id)
+async def _bot_wake_ready(ctx: Any, bot: str) -> str:
+    """``"ready"`` when the host lists *bot* among the Bots this app may reach (so the
+    wake loop can wake it through ``POST /api/members/{id}/wake``), else the refusal.
+    Registration stands either way; ``POST /leads/{id}/wake`` tries a wake later."""
+    found = await bot_wake.find_bot_id(ctx, bot)
+    return found if found.startswith("refused") else "ready"
 
 
 @_owner("leads.wake")
 async def _lead_wake(request, ctx, root):
-    lead = identity.active_leads(root).get(request.match_info.get("lead_id", ""))
+    """Wake a Bot lead now, through the host's Bot API. 409 with the host's reason when
+    the host refuses, so the owner sees why instead of a Bot that never answers."""
+    lead_id = request.match_info.get("lead_id", "")
+    lead = identity.active_leads(root).get(lead_id)
     if not lead or not lead.get("bot"):
         return web.json_response({"status": "refused", "reason": "not_a_bot_lead"}, status=409)
-    wake_state = await _arm_bot_wake(ctx, request.match_info["lead_id"], lead["bot"])
-    return web.json_response({"status": "accepted" if wake_state == "armed" else "refused",
-                              "wake": wake_state}, status=200 if wake_state == "armed" else 409)
+    ref = f"{lead_id}.owner-{int(time.time())}"
+    outcome = await bot_wake.wake_and_log(ctx, lead["bot"], ref)
+    ok = not outcome.startswith("refused")
+    return web.json_response({"status": "accepted" if ok else "refused", "wake": outcome},
+                             status=200 if ok else 409)
 
 
 @_owner("panel")
@@ -185,7 +163,6 @@ async def _lead_remove(request, ctx, root):
         identity.retire(root, request.match_info.get("lead_id", ""))
     except identity.IdentityError as exc:
         return web.json_response({"status": "refused", "reason": exc.code}, status=409)
-    await _disarm_bot_wake(ctx, request.match_info.get("lead_id", ""))
     return web.json_response({"status": "accepted"})
 
 
@@ -311,28 +288,9 @@ def register_routes(ctx: Any) -> list[Route]:
 _tasks: dict[str, tuple[asyncio.Task, asyncio.Event]] = {}
 
 
-async def rearm_bot_wakes(ctx: Any, root: Path) -> dict[str, str]:
-    """Arm the inbox probe again for every active Bot lead: ``{lead_id: wake state}``.
-
-    The host removes an app's crons when the app is disabled and does not bring them
-    back on enable, so without this a re-enabled app has its tools back in the Bot's
-    chat but can no longer wake it. A Bot whose owner switch is off is refused by the
-    host, as on add; that is reported, not raised.
-    """
-    out: dict[str, str] = {}
-    for lead_id, lead in identity.active_leads(root).items():
-        if lead.get("bot"):
-            try:
-                out[lead_id] = await _arm_bot_wake(ctx, lead_id, lead["bot"])
-            except Exception as exc:  # noqa: BLE001 - one lead must not stop the startup
-                out[lead_id] = f"error: {str(exc)[:120]}"
-    return out
-
-
 async def on_startup(ctx: Any) -> None:
     root = ledger_root(ctx)
     ledger.append(root, limits.CONTROL, "app/started", "app", {})
-    await rearm_bot_wakes(ctx, root)
     stop = asyncio.Event()
     task = asyncio.create_task(wake.run_loop(ctx, root, stop), name="team-mode-wake-loop")
     _tasks[str(root)] = (task, stop)

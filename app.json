@@ -47,7 +47,7 @@
   "permissions": {
     "api": ["/api/apps/team-mode", "/api/apps/team-mode/*", "/api/members", "/api/workspaces", "/api/teams",
             "/api/chat/slots/*"],
-    "bots": ["tools"],
+    "bots": ["read", "wake", "tools"],
     "storage": true,
     "spawn": true,
     "cron": true,
