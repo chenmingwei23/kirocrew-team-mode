@@ -46,7 +46,8 @@
   },
   "permissions": {
     "api": ["/api/apps/team-mode", "/api/apps/team-mode/*", "/api/members", "/api/workspaces", "/api/teams",
-            "/api/chat/slots/*", "/api/bot-chat-app-tools/*"],
+            "/api/chat/slots/*"],
+    "bots": ["tools"],
     "storage": true,
     "spawn": true,
     "cron": true,

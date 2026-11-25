@@ -152,48 +152,49 @@ export function groupError(err) {
   return (m && GROUP_ERRORS[m[1]]) || 'Could not change the group. Try again.'
 }
 
-/** The host's per-Bot app-tool switch (`/api/bot-chat-app-tools/{bot}`) and the ref of
- *  this app's offer (app.json `contributes.botChatServers`). */
-export const CHAT_TOOLS = '/api/bot-chat-app-tools'
-export const CHAT_TOOLS_REF = 'team-mode:team'
+/** The host's owner-only list of the Bots ticked for this app (`permissions.bots`).
+ *  A ticked Bot's own chat carries this app's `contributes.botChatServers` once the
+ *  owner approved the `tools` scope and the `bot_chat_app_tools` preview is on. */
+export const CHAT_TOOLS = '/api/apps/team-mode/bot-grants'
 
-/** `{show, on}` for the switch from the host's `GET` answer. Hidden unless the host's
- *  preview is on AND it lists this app's offer: preview off shows no switch at all. */
-export function chatToolsSwitch(view) {
-  const offered = Array.isArray(view?.offered) ? view.offered : []
-  const enabled = Array.isArray(view?.enabled) ? view.enabled : []
-  return { show: view?.preview === true && offered.includes(CHAT_TOOLS_REF), on: enabled.includes(CHAT_TOOLS_REF) }
+/** `{show, approved, on}` for one Bot's switch from the host's `GET` answer
+ *  (`{bots, declaredScopes, scopes}`). Hidden unless the manifest declares `tools`;
+ *  `approved` is false until the owner approves that scope on the app's page. */
+export function chatToolsSwitch(view, crew) {
+  const declared = Array.isArray(view?.declaredScopes) ? view.declaredScopes : []
+  const scopes = Array.isArray(view?.scopes) ? view.scopes : []
+  const bots = Array.isArray(view?.bots) ? view.bots : []
+  return { show: declared.includes('tools'), approved: scopes.includes('tools'), on: !!crew && bots.includes(crew) }
 }
 
-/** The `PUT` body that turns this app's server on or off and keeps any other app's. */
-export function chatToolsBody(view, on) {
-  const others = (Array.isArray(view?.enabled) ? view.enabled : []).filter((r) => r !== CHAT_TOOLS_REF)
-  return { servers: on ? [...others, CHAT_TOOLS_REF] : others }
+/** The `PUT` body that ticks or unticks one Bot and keeps every other ticked Bot. */
+export function chatToolsBody(view, crew, on) {
+  const others = (Array.isArray(view?.bots) ? view.bots : []).filter((b) => b !== crew)
+  return { bots: on ? [...others, crew] : others }
 }
 
 /**
  * Remove takes a Bot out of the team, and nothing it was given for the team stays
- * behind: retire the lead (the backend also drops its wake job), then turn Team Mode's
- * tools off in the Bot's own chat. The switch is the host's owner-only route, which the
- * app backend cannot write, so the page does it with the owner's session. Another app's
- * tools on the same Bot are kept. A legacy lead (`crew` empty) has no switch.
+ * behind: retire the lead (the backend also drops its wake job), then untick the Bot
+ * for this app so its own chat loses the team tools. The list is the host's owner-only
+ * route, which the app backend cannot write, so the page does it with the owner's
+ * session. Other ticked Bots are kept. A legacy lead (`crew` empty) has no switch.
  */
 export async function removeFromTeam(api, leadId, crew) {
   await api.del(`/api/apps/team-mode/leads/${encodeURIComponent(leadId)}`)
   if (!crew) return
-  const url = `${CHAT_TOOLS}/${encodeURIComponent(crew)}`
-  const view = await api.get(url)
-  if (chatToolsSwitch(view).on) await api.put(url, chatToolsBody(view, false))
+  const view = await api.get(CHAT_TOOLS)
+  if (chatToolsSwitch(view, crew).on) await api.put(CHAT_TOOLS, chatToolsBody(view, crew, false))
 }
 
 const CHAT_TOOLS_ERRORS = {
-  preview_off: 'The Bot chat app tools preview is off.',
-  not_offered: 'Team Mode is not enabled, so it has no tools to offer.',
+  app_not_installed: 'Team Mode is not installed.',
   owner_only: 'Only the owner can change this.',
-  no_such_bot: 'This Bot is gone.',
+  invalid_bot_grants: 'Too many Bots are ticked for Team Mode.',
+  bot_grants_not_saved: 'Bot access was not saved. Try again.',
 }
 
-/** Plain English for a refusal from `PUT /api/bot-chat-app-tools/{bot}`. */
+/** Plain English for a refusal from `PUT /api/apps/team-mode/bot-grants`. */
 export function chatToolsError(err) {
   const text = String(err?.body || err?.message || err || '')
   const m = text.match(/"code"\s*:\s*"([a-z_]+)"/)

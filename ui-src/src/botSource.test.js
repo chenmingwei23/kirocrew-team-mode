@@ -108,52 +108,54 @@ test('teamLeadIds: a core Bot team picks the Bots already in Team Mode, in team 
   assert.deepEqual(teamLeadIds({ members: ['api-lead', 'docs-lead', 'web-lead', 'nobody'] }, leads), ['L-2', 'L-1'])
 })
 
-// The owner's switch on the Team Mode tab (host GET/PUT /api/bot-chat-app-tools/{bot}).
-test('the chat-tools switch shows only with the preview on and this app offered', () => {
-  const offered = ['team-mode:team']
-  assert.deepEqual(chatToolsSwitch({ preview: true, offered, enabled: [] }), { show: true, on: false })
-  assert.deepEqual(chatToolsSwitch({ preview: true, offered, enabled: ['team-mode:team'] }), { show: true, on: true })
-  assert.equal(chatToolsSwitch({ preview: false, offered, enabled: [] }).show, false)
-  assert.equal(chatToolsSwitch({ preview: true, offered: ['other:x'], enabled: [] }).show, false)
-  assert.equal(chatToolsSwitch(null).show, false)
+// The owner's switch on the Team Mode tab (host GET/PUT /api/apps/team-mode/bot-grants).
+const GRANTS = { declaredScopes: ['tools'], scopes: ['tools'] }
+
+test('the chat-tools switch shows when tools is declared, and is on for a ticked Bot', () => {
+  assert.deepEqual(chatToolsSwitch({ ...GRANTS, bots: [] }, 'ira'), { show: true, approved: true, on: false })
+  assert.deepEqual(chatToolsSwitch({ ...GRANTS, bots: ['ira'] }, 'ira'), { show: true, approved: true, on: true })
+  assert.equal(chatToolsSwitch({ ...GRANTS, bots: ['ira'] }, 'other').on, false)
+  assert.equal(chatToolsSwitch({ declaredScopes: ['tools'], scopes: [], bots: [] }, 'ira').approved, false)
+  assert.equal(chatToolsSwitch({ declaredScopes: [], scopes: [], bots: [] }, 'ira').show, false)
+  assert.equal(chatToolsSwitch(null, 'ira').show, false)
 })
 
-test('the chat-tools PUT body flips this app only and keeps another app on', () => {
-  const view = { enabled: ['other:x'] }
-  assert.deepEqual(chatToolsBody(view, true), { servers: ['other:x', 'team-mode:team'] })
-  assert.deepEqual(chatToolsBody({ enabled: ['other:x', 'team-mode:team'] }, false), { servers: ['other:x'] })
+test('the chat-tools PUT body ticks or unticks this Bot only and keeps the other ticked Bots', () => {
+  assert.deepEqual(chatToolsBody({ bots: ['ada'] }, 'ira', true), { bots: ['ada', 'ira'] })
+  assert.deepEqual(chatToolsBody({ bots: ['ada', 'ira'] }, 'ira', false), { bots: ['ada'] })
+  assert.deepEqual(chatToolsBody({ bots: ['ira'] }, 'ira', true), { bots: ['ira'] }) // no duplicate
 })
 
 test('a chat-tools refusal reads as plain English', () => {
-  assert.match(chatToolsError({ body: '{"error":"preview_off","code":"preview_off"}' }), /preview/)
+  assert.match(chatToolsError({ body: '{"error":"x","code":"bot_grants_not_saved"}' }), /not saved/)
   assert.match(chatToolsError({ body: '{"code":"owner_only"}' }), /owner/)
   assert.equal(chatToolsError(new Error('boom')), 'Could not change the switch. Try again.')
 })
 
-// Remove takes the Bot out of the team and turns its switch off; the Bot stays (pod
+// Remove takes the Bot out of the team and unticks it; the Bot stays (pod
 // kc-r4-tree: before this, Ira's switch was still on after Remove, only the cron went).
-function fakeApi(enabled) {
+function fakeApi(bots) {
   const calls = []
   return {
     calls,
     del: async (url) => { calls.push(['DELETE', url]) },
-    get: async (url) => { calls.push(['GET', url]); return { preview: true, offered: ['team-mode:team'], enabled } },
-    put: async (url, body) => { calls.push(['PUT', url, body]); return { enabled: body.servers } },
+    get: async (url) => { calls.push(['GET', url]); return { ...GRANTS, bots } },
+    put: async (url, body) => { calls.push(['PUT', url, body]); return { ...GRANTS, bots: body.bots } },
   }
 }
 
-test('removeFromTeam retires the lead, then turns Team Mode tools off in the Bot chat, keeping other apps', async () => {
-  const api = fakeApi(['other:x', 'team-mode:team'])
+test('removeFromTeam retires the lead, then unticks the Bot for Team Mode, keeping other ticked Bots', async () => {
+  const api = fakeApi(['ada', 'ira'])
   await removeFromTeam(api, 'L-1', 'ira')
   assert.deepEqual(api.calls, [
     ['DELETE', '/api/apps/team-mode/leads/L-1'],
-    ['GET', '/api/bot-chat-app-tools/ira'],
-    ['PUT', '/api/bot-chat-app-tools/ira', { servers: ['other:x'] }],
+    ['GET', '/api/apps/team-mode/bot-grants'],
+    ['PUT', '/api/apps/team-mode/bot-grants', { bots: ['ada'] }],
   ])
-  const off = fakeApi([])
+  const off = fakeApi(['ada'])
   await removeFromTeam(off, 'L-1', 'ira')
   assert.equal(off.calls.filter((c) => c[0] === 'PUT').length, 0) // already off: nothing to write
-  const legacy = fakeApi(['team-mode:team'])
+  const legacy = fakeApi(['ira'])
   await removeFromTeam(legacy, 'L-2', '')
   assert.deepEqual(legacy.calls, [['DELETE', '/api/apps/team-mode/leads/L-2']])
 })

@@ -165,7 +165,7 @@ function TeamModePanel() {
   ] });
 }
 function ChatToolsSwitch({ api, crew, name, leadId, notify }) {
-  const url = `${CHAT_TOOLS}/${encodeURIComponent(crew)}`;
+  const url = CHAT_TOOLS;
   const [view, setView] = useState(null);
   const [ask, setAsk] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -181,14 +181,14 @@ function ChatToolsSwitch({ api, crew, name, leadId, notify }) {
       live = false;
     };
   }, [api, url]);
-  const { show, on } = chatToolsSwitch(view);
+  const { show, approved, on } = chatToolsSwitch(view, crew);
   if (!show) return null;
   const confirm = async () => {
     const next = ask;
     setBusy(true);
     setErr("");
     try {
-      setView(await api.put(url, chatToolsBody(view, next)));
+      setView(await api.put(url, chatToolsBody(view, crew, next)));
       if (next && leadId) await api.post(`${BASE}/leads/${encodeURIComponent(leadId)}/wake`, {}).catch(() => null);
       notify?.(next ? `${name} can now answer the team from its own chat` : `Team Mode tools are off for ${name}`, { type: "success" });
       setAsk(null);
@@ -202,9 +202,9 @@ function ChatToolsSwitch({ api, crew, name, leadId, notify }) {
     /* @__PURE__ */ jsxs("div", { style: { display: "flex", alignItems: "center", gap: 8 }, children: [
       /* @__PURE__ */ jsxs("span", { style: { flex: 1 }, children: [
         /* @__PURE__ */ jsx("span", { className: "tm-label", style: { display: "block", margin: 0 }, children: "Answer from its own chat" }),
-        /* @__PURE__ */ jsx("span", { className: "tm-muted", children: on ? `On: ${name} is woken in its own chat when the team needs it.` : "Off: Team Mode cannot wake this Bot." })
+        /* @__PURE__ */ jsx("span", { className: "tm-muted", children: !approved ? "Approve Team Mode's Bot tools access on its app page first." : on ? `On: ${name} is woken in its own chat when the team needs it.` : "Off: Team Mode cannot wake this Bot." })
       ] }),
-      /* @__PURE__ */ jsx("span", { "data-testid": "tm-panel-chat-tools-toggle", "data-on": on ? "true" : "false", children: /* @__PURE__ */ jsx(Toggle, { checked: on, disabled: busy, label: "Answer from its own chat", onChange: (v) => setAsk(v) }) })
+      /* @__PURE__ */ jsx("span", { "data-testid": "tm-panel-chat-tools-toggle", "data-on": on ? "true" : "false", children: /* @__PURE__ */ jsx(Toggle, { checked: on, disabled: busy || !approved && !on, label: "Answer from its own chat", onChange: (v) => setAsk(v) }) })
     ] }),
     ask !== null && /* @__PURE__ */ jsx(
       Modal,

@@ -95,29 +95,28 @@ function groupError(err) {
   const m = text.match(/"reason"\s*:\s*"([a-z_]+)"/);
   return m && GROUP_ERRORS[m[1]] || "Could not change the group. Try again.";
 }
-const CHAT_TOOLS = "/api/bot-chat-app-tools";
-const CHAT_TOOLS_REF = "team-mode:team";
-function chatToolsSwitch(view) {
-  const offered = Array.isArray(view?.offered) ? view.offered : [];
-  const enabled = Array.isArray(view?.enabled) ? view.enabled : [];
-  return { show: view?.preview === true && offered.includes(CHAT_TOOLS_REF), on: enabled.includes(CHAT_TOOLS_REF) };
+const CHAT_TOOLS = "/api/apps/team-mode/bot-grants";
+function chatToolsSwitch(view, crew) {
+  const declared = Array.isArray(view?.declaredScopes) ? view.declaredScopes : [];
+  const scopes = Array.isArray(view?.scopes) ? view.scopes : [];
+  const bots = Array.isArray(view?.bots) ? view.bots : [];
+  return { show: declared.includes("tools"), approved: scopes.includes("tools"), on: !!crew && bots.includes(crew) };
 }
-function chatToolsBody(view, on) {
-  const others = (Array.isArray(view?.enabled) ? view.enabled : []).filter((r) => r !== CHAT_TOOLS_REF);
-  return { servers: on ? [...others, CHAT_TOOLS_REF] : others };
+function chatToolsBody(view, crew, on) {
+  const others = (Array.isArray(view?.bots) ? view.bots : []).filter((b) => b !== crew);
+  return { bots: on ? [...others, crew] : others };
 }
 async function removeFromTeam(api, leadId, crew) {
   await api.del(`/api/apps/team-mode/leads/${encodeURIComponent(leadId)}`);
   if (!crew) return;
-  const url = `${CHAT_TOOLS}/${encodeURIComponent(crew)}`;
-  const view = await api.get(url);
-  if (chatToolsSwitch(view).on) await api.put(url, chatToolsBody(view, false));
+  const view = await api.get(CHAT_TOOLS);
+  if (chatToolsSwitch(view, crew).on) await api.put(CHAT_TOOLS, chatToolsBody(view, crew, false));
 }
 const CHAT_TOOLS_ERRORS = {
-  preview_off: "The Bot chat app tools preview is off.",
-  not_offered: "Team Mode is not enabled, so it has no tools to offer.",
+  app_not_installed: "Team Mode is not installed.",
   owner_only: "Only the owner can change this.",
-  no_such_bot: "This Bot is gone."
+  invalid_bot_grants: "Too many Bots are ticked for Team Mode.",
+  bot_grants_not_saved: "Bot access was not saved. Try again."
 };
 function chatToolsError(err) {
   const text = String(err?.body || err?.message || err || "");

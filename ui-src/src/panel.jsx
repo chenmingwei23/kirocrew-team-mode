@@ -116,12 +116,13 @@ export default function TeamModePanel() {
   )
 }
 
-// The owner's switch for Team Mode tools in this Bot's OWN chat. It writes the host's
-// owner-only route (`PUT /api/bot-chat-app-tools/{bot}`), never the app's: the host
-// decides what a Bot's chat mounts. Hidden while the host's preview is off. Each flip
+// The owner's switch for Team Mode tools in this Bot's OWN chat. It ticks or unticks
+// this Bot in the host's owner-only list (`PUT /api/apps/team-mode/bot-grants`), the
+// same list as "Bots this app can reach" on the app's page: the host decides what a
+// Bot's chat mounts. Disabled until the owner approves the `tools` scope. Each flip
 // asks first, since on lets Team Mode wake the Bot and off starts its chat afresh.
 function ChatToolsSwitch({ api, crew, name, leadId, notify }) {
-  const url = `${CHAT_TOOLS}/${encodeURIComponent(crew)}`
+  const url = CHAT_TOOLS
   const [view, setView] = useState(null)
   const [ask, setAsk] = useState(null) // the value the owner is being asked to confirm
   const [busy, setBusy] = useState(false)
@@ -131,14 +132,14 @@ function ChatToolsSwitch({ api, crew, name, leadId, notify }) {
     api.get(url).then((v) => { if (live) setView(v) }, () => { if (live) setView(null) })
     return () => { live = false }
   }, [api, url])
-  const { show, on } = chatToolsSwitch(view)
+  const { show, approved, on } = chatToolsSwitch(view, crew)
   if (!show) return null
   const confirm = async () => {
     const next = ask
     setBusy(true)
     setErr('')
     try {
-      setView(await api.put(url, chatToolsBody(view, next)))
+      setView(await api.put(url, chatToolsBody(view, crew, next)))
       // Turned on: hang the inbox probe on the Bot's chat now (the host refused it until now).
       if (next && leadId) await api.post(`${BASE}/leads/${encodeURIComponent(leadId)}/wake`, {}).catch(() => null)
       notify?.(next ? `${name} can now answer the team from its own chat` : `Team Mode tools are off for ${name}`, { type: 'success' })
@@ -154,10 +155,12 @@ function ChatToolsSwitch({ api, crew, name, leadId, notify }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <span style={{ flex: 1 }}>
           <span className="tm-label" style={{ display: 'block', margin: 0 }}>Answer from its own chat</span>
-          <span className="tm-muted">{on ? `On: ${name} is woken in its own chat when the team needs it.` : 'Off: Team Mode cannot wake this Bot.'}</span>
+          <span className="tm-muted">{!approved
+            ? "Approve Team Mode's Bot tools access on its app page first."
+            : on ? `On: ${name} is woken in its own chat when the team needs it.` : 'Off: Team Mode cannot wake this Bot.'}</span>
         </span>
         <span data-testid="tm-panel-chat-tools-toggle" data-on={on ? 'true' : 'false'}>
-          <Toggle checked={on} disabled={busy} label="Answer from its own chat" onChange={(v) => setAsk(v)} />
+          <Toggle checked={on} disabled={busy || (!approved && !on)} label="Answer from its own chat" onChange={(v) => setAsk(v)} />
         </span>
       </div>
       {ask !== null && (
