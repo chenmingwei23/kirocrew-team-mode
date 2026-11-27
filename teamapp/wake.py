@@ -44,7 +44,7 @@ INBOX_BODY_CHARS = 4000
 def is_notice(item: dict) -> bool:
     """A ``kind="notice"`` message ("I am missing X"): brief only, no wake, no hop."""
     return item.get("type") in ("message/posted", "message/released") and \
-        (item.get("data") or {}).get("kind") == "notice"
+        (item.get("data") or {}).get("kind") in ("notice", "pause")  # pause: shared_rules limit notice
 
 
 def assignment_due(a: dict, now: float, delivered_ts: list[float] = ()) -> dict:
@@ -251,10 +251,19 @@ def _say(d: dict, names: dict) -> str:
     return ", ".join(parts)
 
 
-def _wrap(item: dict, handles: dict[str, str], names: dict | None = None) -> dict:
+def outside_authors(root: Path) -> set[str]:
+    """Another owner's Bots (cross-owner groups). Their words get ``speaker="outside_bot"``."""
+    return {lid for lid, l in fold.directory(root)["leads"].items() if l.get("kind") == "remote"}
+
+
+def _wrap(item: dict, handles: dict[str, str], names: dict | None = None, outside: set | frozenset = frozenset()) -> dict:
     d = item["data"]
     who = fold.actor(item["by"])
     name = handles.get(who, who)
+    # who said it, written by the app and never read from the text (shared_rules.py, Joe's plan v3)
+    speaker = ("owner" if who == fold.OWNER else "other_owner" if str(who).startswith("peer:")
+               else "outside_bot" if who in outside else "own_bot" if str(who).startswith("L-") else "app")
+    other = f' speaker="{speaker}"'
     base = {"channel_id": item["channel_id"], "seq": item["seq"], "type": item["type"], "from": name,
             "ts": item["ts"]}
     if names:
@@ -267,7 +276,7 @@ def _wrap(item: dict, handles: dict[str, str], names: dict | None = None) -> dic
                     mentions=d.get("mentions", []), cc=d.get("cc", []), everyone=d.get("everyone", False),
                     reply_to=d.get("reply_to"), answers=d.get("answers"), truncated=cut,
                     released=bool(item.get("released")),
-                    body=(f'<peer-message from="{name}" channel="{item["channel_id"]}" seq="{item["seq"]}">'
+                    body=(f'<peer-message from="{name}"{other} channel="{item["channel_id"]}" seq="{item["seq"]}">'
                           f"{text}</peer-message>"))
     else:
         base.update({k: v for k, v in d.items() if k in (
@@ -320,7 +329,8 @@ def inbox_read(root: Path, lead_id: str, limit: int = 20, ack: bool = True) -> d
     briefed = (member["dues"][-1].get("upto") or {}) if member["dues"] and latest_brief else {}
     shown = [i for i in items if not (is_notice(i) and i["seq"] <= int(briefed.get(i["channel_id"], 0)))]
     names = {cid: say_names(root, cid, handles) for cid in {i["channel_id"] for i in shown}}
-    return {"brief": latest_brief, "items": [_wrap(i, handles, names[i["channel_id"]]) for i in shown],
+    outside = outside_authors(root)
+    return {"brief": latest_brief, "items": [_wrap(i, handles, names[i["channel_id"]], outside) for i in shown],
             "upto": upto, "remaining": max(0, total - len(items)), "acked": bool(ack)}
 
 
@@ -349,6 +359,8 @@ def check_unanswered(root: Path, now: float) -> int:
         def nm(who: str) -> str:  # people read this line: handles, never L-/A- ids (video round 2, S21)
             return "Owner" if who == fold.OWNER else names.get(who, "a member")
         for cid in fold.list_channels(root):
+            if ledger.is_mirror(root, fold.channel_file(cid)):
+                continue  # the host marks late answers in a cross-owner group
             ch = fold.fold_channel(root, cid)
             for aid, a in ch["assignments"].items():
                 m = members.get(a["to"])
@@ -445,6 +457,8 @@ async def tick(ctx: Any, root: Path, now: float | None = None) -> dict:
     if br is not None:
         try:
             for cid in fold.list_channels(root):
+                if ledger.is_mirror(root, fold.channel_file(cid)):
+                    continue  # the host's bar raiser rules on a cross-owner group
                 for case in br.detect(root, cid, now):
                     if limits.stopped(root):
                         return did
@@ -459,6 +473,8 @@ async def tick(ctx: Any, root: Path, now: float | None = None) -> dict:
     for lead_id, lead in identity.active_leads(root).items():
         if limits.stopped(root):
             break
+        if lead.get("kind") == "remote":
+            continue  # another owner's Bot: its own gateway wakes it (DESIGN.md: whose Bot, whose wake)
         member = fold.fold_member(root, lead_id)
         items = fold.unread(root, lead_id)
         channels = {cid: fold.fold_channel(root, cid) for cid in fold.list_channels(root)}

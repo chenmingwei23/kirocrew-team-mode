@@ -49,6 +49,7 @@
             "/api/chat/slots/*"],
     "bots": ["read", "wake", "tools"],
     "storage": true,
+    "network": true,
     "spawn": true,
     "cron": true,
     "mcpTools": [
