@@ -195,7 +195,8 @@ def build(root: Path, since: str | None = None, now: float | None = None) -> dic
         ch = fold.fold_channel(root, cid)
         meta = dict(view["channel"])
         meta.update(unread=_owner_unread(ch), stubs=view["stubs"], held=view["held"],
-                    closed=bool(ch.get("closed")), thread_titles=fold.thread_titles(root, cid))
+                    closed=bool(ch.get("closed")), thread_titles=fold.thread_titles(root, cid),
+                    shared=bool(ch.get("shared")), mirror=ledger.is_mirror(root, fold.channel_file(cid)))
         if ch["kind"] == "group" and not ch.get("closed"):
             meta["close_check"] = lifecycle.close_blockers(root, cid)
         channels.append(meta)

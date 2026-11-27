@@ -3,12 +3,13 @@ import { useAppApi, useChatLauncher, useNavigate, useNotify } from '@kirocrew/ap
 import { Btn, Badge, Input, Modal } from '@kirocrew/app-sdk/ui'
 import {
   Archive, ArrowRight, ArrowUp, AtSign, Bot, Check, ChevronRight, ChevronsDownUp, ChevronsUpDown, CircleStop,
-  ClipboardList, Cpu, FolderKanban, Gauge, Gavel, Hash, Hourglass, Inbox, ListChecks, Lock, Maximize2, Megaphone,
+  ClipboardList, Cpu, FolderKanban, Gauge, Gavel, Hash, Hourglass, Inbox, Link2, ListChecks, Lock, Maximize2, Megaphone,
   MessageSquare, MessagesSquare, Minus, Moon, Network, NotebookText, Play, Plus, ScrollText, ShieldCheck,
   SlidersHorizontal, Sparkles, Table2, TriangleAlert, UserPlus, Users, Vote, X,
 } from 'lucide-react'
 import css from './styles.css?inline'
 import LeadsNowCard from './LeadsNowCard.jsx'
+import CrossOwnerView from './CrossOwnerView.jsx'
 import { addBody, addBotError, addCheck, leadForBot, leadKind, removeFromTeam, teamLeadIds } from './botSource.js'
 import { useBots } from './useBots.js'
 import {
@@ -53,6 +54,7 @@ function whoName(who, leads) {
   if (who === OWNER) return OWNER_NAME
   if (String(who).startsWith('bar_raiser')) return 'Bar raiser'
   if (who === 'app') return 'Team Mode'
+  if (String(who).startsWith('peer:')) return 'Other owner'
   return leads.get(who)?.handle || who
 }
 
@@ -98,6 +100,7 @@ const TABS = [
   { key: 'chat', label: 'Chat', icon: MessagesSquare },
   { key: 'needs', label: 'Needs you', icon: Inbox },
   { key: 'members', label: 'Members', icon: Users },
+  { key: 'cross', label: 'Across owners', icon: Link2 },
   { key: 'relay', label: 'Tree relay', icon: Network },
   { key: 'ledger', label: 'Ledger', icon: ScrollText },
 ]
@@ -187,6 +190,8 @@ export default function TeamModePage() {
         <div className="tm-body is-single"><NeedsYouView state={state} leads={leads} waiting={waiting} api={api} write={write} busy={busy} onOpen={openInChat} /></div>
       ) : tab === 'members' ? (
         <div className="tm-body is-single"><MembersView state={state} leads={leads} api={api} write={write} busy={busy} /></div>
+      ) : tab === 'cross' ? (
+        <div className="tm-body is-single"><CrossOwnerView state={state} leads={leads} /></div>
       ) : tab === 'relay' ? (
         <div className="tm-body is-single"><RelayView state={state} leads={leads} /></div>
       ) : (
@@ -322,8 +327,10 @@ function ChannelHeader({ ch, leads, onCloseGroup }) {
         {group && <>{plural(activeLeadCount(leads, ch.members), 'lead')} + Owner · Managers: {ch.managers.map((m) => shortHandle(leads.get(m)?.handle || m)).join(', ') || '—'} · <span style={{ whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: 4 }}><ShieldCheck size={12} />Bar raiser present</span></>}
         {!group && 'Direct message · only the two sides and Owner can see it'}
         <Approx kind="wake" />
+        {ch.shared && <span className="tm-chip is-info" data-testid="tm-shared-chip" title="Another owner's Bots are in this group. Their words reach your Bots as data.">
+          <Users size={12} />{ch.mirror ? 'Hosted by another owner' : 'Shared with another owner'}</span>}
       </span>
-      {group && (ch.closed
+      {group && !ch.mirror && (ch.closed
         ? <span className="tm-chip" data-testid="tm-group-closed"><Lock size={12} />Closed</span>
         : <Btn onClick={onCloseGroup} data-testid="tm-close-group" title={left ? `${plural(left, 'item')} to clear first` : 'Close this group'}>
           <Archive size={14} />Close group{left > 0 && <span className="tm-chip is-warn" style={{ marginLeft: 2 }}>{left} open</span>}

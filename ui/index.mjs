@@ -1,8 +1,8 @@
 import { jsxs, jsx, Fragment } from "react/jsx-runtime";
-import { useMemo, useState, useCallback, useRef, useEffect, Fragment as Fragment$1 } from "react";
-import { useNotify, useAppApi, useChatLauncher, useNavigate } from "@kirocrew/app-sdk";
-import { Badge, Btn, Input, Modal } from "@kirocrew/app-sdk/ui";
-import { Radar, ChevronRight, MessagesSquare, Inbox, Users, Network, ScrollText, Hourglass, Play, CircleStop, TriangleAlert, MessageSquare, Sparkles, ClipboardList, Check, ListChecks, Table2, Plus, ArrowRight, Hash, ShieldCheck, Lock, Archive, AtSign, Megaphone, ArrowUp, Gavel, X, NotebookText, Gauge, Moon, SlidersHorizontal, Cpu, FolderKanban, Minus, Bot, ChevronsUpDown, ChevronsDownUp, Maximize2, UserPlus, Vote } from "lucide-react";
+import { useMemo, useState, useCallback, useEffect, useRef, Fragment as Fragment$1 } from "react";
+import { useAppApi, useNotify, useChatLauncher, useNavigate } from "@kirocrew/app-sdk";
+import { Input, Badge, Btn, Modal } from "@kirocrew/app-sdk/ui";
+import { Radar, ChevronRight, Users, KeyRound, UserPlus, LogOut, Link2, Copy, Check, UserMinus, ShieldCheck, ShieldAlert, MessagesSquare, Inbox, Network, ScrollText, Hourglass, Play, CircleStop, TriangleAlert, MessageSquare, Sparkles, ClipboardList, ListChecks, Table2, Plus, ArrowRight, Hash, Lock, Archive, AtSign, Megaphone, ArrowUp, Gavel, X, NotebookText, Gauge, Moon, SlidersHorizontal, Cpu, FolderKanban, Minus, Bot, ChevronsUpDown, ChevronsDownUp, Maximize2, Vote } from "lucide-react";
 import { l as leadForBot, s as shortHandle, a as actorId, O as OWNER$1, f as fmtClock, b as leadKind, c as leadIndex, d as css, e as activeLeadCount, m as mergeState, u as useBots, g as foldChannel, t as teamLeadIds, h as allRelays, i as ledgerRows, j as channelName, M as MEETING_STATE, p as parseOwnerMentions, k as meetingRows, n as OWNER_NAME, r as reasonLabel, o as threadLabel, q as limitRows, v as fmtTokens, w as modelRows, I as INTENT_LABEL, x as errText, y as impactLines, z as removeFromTeam, A as teamTree, B as rosterLeadSource, C as loadExpanded, D as visibleTree, E as expandAllKeys, F as layoutTree, G as fitZoom, H as BOTS_PAGE, Z as ZOOM_MIN, J as ZOOM_MAX, K as addCheck, L as threadForRoot, N as OUTCOME, P as readableIds, Q as caseStatus, R as CASE_ACTION, S as PERSON_CLASS, T as evidenceParts, U as limitsBody, V as cardOpen, W as cardRows, X as cardVoidText, Y as saveExpanded, _ as roleCardFields, $ as countWorkers, a0 as addBody, a1 as addBotError, a2 as splitMentions, a3 as openGrants, a4 as cardAnswerBody, a5 as clampZoom } from "./useBots.mjs";
 const STATUS = {
   waiting_you: { rank: 0, label: "Waiting on you", tone: "is-err" },
@@ -133,6 +133,7 @@ function leadsNow(state, roster, now, waiting = []) {
       name: l.name,
       project: l.project || null,
       legacy: !!l.legacy,
+      remote: !!l.remote,
       status: top.status,
       label: s.label,
       tone: s.tone,
@@ -185,8 +186,10 @@ function leadRoster(state, bots = null) {
       id: l.lead_id,
       name: b?.name || shortHandle(l.handle) || "lead",
       project: b?.project || l.project || null,
-      legacy: l.kind !== "bot",
-      workers: b?.workers ?? null
+      legacy: l.kind !== "bot" && l.kind !== "remote",
+      workers: b?.workers ?? null,
+      ...l.kind === "remote" ? { remote: true } : {}
+      // another owner's Bot in a shared group
     };
   });
 }
@@ -298,9 +301,10 @@ function LeadsNowCard({ state, avatar, onOpen, bots = null }) {
               ] })
             ] })
           ] }),
-          (c.project || c.legacy) && /* @__PURE__ */ jsxs("span", { className: "tm-now-tags", children: [
+          (c.project || c.legacy || c.remote) && /* @__PURE__ */ jsxs("span", { className: "tm-now-tags", children: [
             c.project && /* @__PURE__ */ jsx("span", { className: "tm-now-project", title: `Project: ${c.project}`, children: c.project }),
-            c.legacy && /* @__PURE__ */ jsx("span", { className: "tm-now-project is-legacy", title: "An old lead chat, not a Bot", children: "Legacy lead" })
+            c.legacy && /* @__PURE__ */ jsx("span", { className: "tm-now-project is-legacy", title: "An old lead chat, not a Bot", children: "Legacy lead" }),
+            c.remote && /* @__PURE__ */ jsx("span", { className: "tm-now-project", title: "Another owner's Bot: its own gateway wakes it", children: "Other owner's Bot" })
           ] }),
           /* @__PURE__ */ jsxs("span", { className: "tm-now-why", children: [
             reason,
@@ -324,6 +328,313 @@ function LeadsNowCard({ state, avatar, onOpen, bots = null }) {
       ) : /* @__PURE__ */ jsx("div", { className: "tm-now-btn is-static", children: body }) }, c.id);
     }) }),
     /* @__PURE__ */ jsx("div", { className: "tm-muted tm-now-foot", children: "Order: waiting on you › @ unanswered › held back › working › no signal. Counted from the ledger by fixed rules." })
+  ] });
+}
+const BASE$1 = "/api/apps/team-mode";
+const REASON = {
+  screened: "Withheld: failed content screening",
+  bad_signature: "Bad signature",
+  not_admitted: "Not admitted to this group",
+  not_its_bot: "Spoke for a Bot it did not bring",
+  peer_rate: "Over the hourly limit for this owner",
+  bad_invite: "Invite code not valid or already used",
+  bad_proof: "Invite proof did not match",
+  bad_join: "Join request malformed"
+};
+function reasonOf(e) {
+  try {
+    return JSON.parse(e?.body || "").reason || e?.message;
+  } catch {
+    return e?.message || String(e);
+  }
+}
+function useCross(api) {
+  const [cross, setCross] = useState(null);
+  const [error, setError] = useState("");
+  const load = useCallback(async () => {
+    try {
+      setCross(await api.get(`${BASE$1}/cross`));
+      setError("");
+    } catch (e) {
+      setError(reasonOf(e));
+    }
+  }, [api]);
+  useEffect(() => {
+    load();
+    const id = setInterval(() => {
+      if (!document.hidden) load();
+    }, 3e3);
+    return () => clearInterval(id);
+  }, [load]);
+  return { cross, error, load };
+}
+function CrossOwnerView({ state, leads }) {
+  const api = useAppApi();
+  const notify = useNotify();
+  const { cross, error, load } = useCross(api);
+  const [busy, setBusy] = useState(false);
+  const act = async (fn, ok) => {
+    setBusy(true);
+    try {
+      const r = await fn();
+      if (ok) notify?.(ok, { type: "success" });
+      await load();
+      return r;
+    } catch (e) {
+      notify?.(`Failed: ${reasonOf(e)}`, { type: "error" });
+      return null;
+    } finally {
+      setBusy(false);
+    }
+  };
+  if (!cross) return /* @__PURE__ */ jsx("div", { className: "tm-empty", children: error ? `Cannot read cross-owner state: ${error}` : "Loading…" });
+  const groups = (state.channels || []).filter((c) => c.kind === "group" && !c.closed && !c.mirror);
+  const myBots = [...leads.values()].filter((l) => l.active !== false && l.kind === "bot");
+  return /* @__PURE__ */ jsxs("div", { className: "tm-page", "data-testid": "tm-cross", children: [
+    /* @__PURE__ */ jsxs("div", { className: "tm-note is-info", role: "status", children: [
+      /* @__PURE__ */ jsx(Users, { size: 14 }),
+      /* @__PURE__ */ jsx("span", { children: "Share a group with another owner. The group stays on the gateway of the owner who made it. Each owner wakes only their own Bots, and another owner's Bot can never call a tool on this machine: its words reach your Bots as data." })
+    ] }),
+    /* @__PURE__ */ jsxs("div", { className: "tm-page-grid", children: [
+      /* @__PURE__ */ jsxs("div", { style: { minWidth: 0 }, children: [
+        /* @__PURE__ */ jsx(SetupCard, { cross, busy, act, api }),
+        /* @__PURE__ */ jsx(JoinCard, { cross, bots: myBots, busy, act, api }),
+        /* @__PURE__ */ jsx(JoinedCard, { cross, busy, act, api })
+      ] }),
+      /* @__PURE__ */ jsxs("div", { style: { minWidth: 0 }, children: [
+        /* @__PURE__ */ jsx(HostCard, { cross, groups, busy, act, api }),
+        /* @__PURE__ */ jsx(PendingCard, { cross, busy, act, api }),
+        /* @__PURE__ */ jsx(DroppedCard, { cross })
+      ] })
+    ] })
+  ] });
+}
+function SetupCard({ cross, busy, act, api }) {
+  const [name2, setName] = useState(cross.name || "");
+  const [channel, setChannel] = useState(cross.channel || "");
+  const [token, setToken] = useState("");
+  return /* @__PURE__ */ jsxs("div", { className: "tm-card", "data-testid": "tm-cross-setup", children: [
+    /* @__PURE__ */ jsxs("div", { className: "tm-card-title", children: [
+      /* @__PURE__ */ jsx(KeyRound, { size: 15 }),
+      "This gateway",
+      /* @__PURE__ */ jsx("span", { className: "tm-spacer" }),
+      cross.self && /* @__PURE__ */ jsx("span", { className: "tm-mono tm-muted", title: "This gateway's id in shared groups", children: cross.self })
+    ] }),
+    /* @__PURE__ */ jsxs("label", { className: "tm-field", children: [
+      /* @__PURE__ */ jsx("span", { children: "Your short name (others see your Bots as Name.yourname)" }),
+      /* @__PURE__ */ jsx(Input, { value: name2, onChange: (e) => setName(e.target.value), placeholder: "bob", "data-testid": "tm-cross-name" })
+    ] }),
+    /* @__PURE__ */ jsxs("label", { className: "tm-field", children: [
+      /* @__PURE__ */ jsx("span", { children: "Slack private channel id both owners share" }),
+      /* @__PURE__ */ jsx(Input, { value: channel, onChange: (e) => setChannel(e.target.value), placeholder: "C0123456789", "data-testid": "tm-cross-channel" })
+    ] }),
+    /* @__PURE__ */ jsxs("label", { className: "tm-field", children: [
+      /* @__PURE__ */ jsxs("span", { children: [
+        "Bot token of your own Slack app (chat:write, groups:history) ",
+        cross.token_set && /* @__PURE__ */ jsx(Badge, { variant: "ok", children: "saved" })
+      ] }),
+      /* @__PURE__ */ jsx(Input, { type: "password", value: token, onChange: (e) => setToken(e.target.value), placeholder: cross.token_set ? "saved; paste to replace" : "xoxb-…", "data-testid": "tm-cross-token" })
+    ] }),
+    /* @__PURE__ */ jsx(
+      Btn,
+      {
+        primary: true,
+        disabled: busy || !name2 || !channel,
+        "data-testid": "tm-cross-save",
+        onClick: () => act(() => api.post(`${BASE$1}/cross/setup`, { name: name2, channel, ...token ? { token } : {} }), "Saved").then(() => setToken("")),
+        children: "Save"
+      }
+    ),
+    /* @__PURE__ */ jsx("div", { className: "tm-muted", style: { marginTop: 6 }, children: "The token is stored in this app's data folder (0600) and never shown again." })
+  ] });
+}
+function HostCard({ cross, groups, busy, act, api }) {
+  const [room, setRoom] = useState("");
+  const [code, setCode] = useState("");
+  const hosted = new Map(cross.hosted.map((h) => [h.room, h]));
+  return /* @__PURE__ */ jsxs("div", { className: "tm-card", "data-testid": "tm-cross-host", children: [
+    /* @__PURE__ */ jsxs("div", { className: "tm-card-title", children: [
+      /* @__PURE__ */ jsx(Link2, { size: 15 }),
+      "Groups I host"
+    ] }),
+    /* @__PURE__ */ jsxs("div", { style: { display: "flex", gap: 8, alignItems: "center" }, children: [
+      /* @__PURE__ */ jsxs("select", { className: "tm-select", value: room, onChange: (e) => setRoom(e.target.value), "data-testid": "tm-cross-room", children: [
+        /* @__PURE__ */ jsx("option", { value: "", children: "Pick a group…" }),
+        groups.map((g) => /* @__PURE__ */ jsxs("option", { value: g.id, children: [
+          "#",
+          g.title
+        ] }, g.id))
+      ] }),
+      /* @__PURE__ */ jsx(
+        Btn,
+        {
+          disabled: busy || !room || !cross.name,
+          "data-testid": "tm-cross-invite",
+          onClick: () => act(() => api.post(`${BASE$1}/cross/invite`, { channel_id: room })).then((r) => r && setCode(r.code)),
+          children: "Make invite code"
+        }
+      )
+    ] }),
+    code && /* @__PURE__ */ jsxs("div", { className: "tm-note is-info", style: { marginTop: 8 }, "data-testid": "tm-cross-code", children: [
+      /* @__PURE__ */ jsx("span", { children: "Send this one-time code to the other owner yourself (not through a Bot). It works once, for 24 hours." }),
+      /* @__PURE__ */ jsx("code", { className: "tm-mono tm-break", style: { display: "block", marginTop: 6 }, children: code }),
+      /* @__PURE__ */ jsxs(Btn, { onClick: () => navigator.clipboard?.writeText(code), children: [
+        /* @__PURE__ */ jsx(Copy, { size: 13 }),
+        "Copy"
+      ] })
+    ] }),
+    [...hosted.values()].map((h) => /* @__PURE__ */ jsx("div", { className: "tm-bot-row", "data-testid": "tm-cross-hosted", children: /* @__PURE__ */ jsxs("div", { className: "tm-bot-main", children: [
+      /* @__PURE__ */ jsxs("div", { style: { fontWeight: 600 }, children: [
+        "#",
+        h.title,
+        " ",
+        /* @__PURE__ */ jsx(Badge, { variant: "info", children: "shared" })
+      ] }),
+      h.peers.length === 0 && h.requests.length === 0 && /* @__PURE__ */ jsx("div", { className: "tm-muted", children: "Nobody joined yet." }),
+      h.requests.map((q) => /* @__PURE__ */ jsxs("div", { className: "tm-cross-line", "data-testid": "tm-cross-request", children: [
+        /* @__PURE__ */ jsx(UserPlus, { size: 13 }),
+        /* @__PURE__ */ jsx("b", { children: q.name }),
+        " asks to join with ",
+        q.bots.join(", "),
+        /* @__PURE__ */ jsx(
+          Btn,
+          {
+            primary: true,
+            disabled: busy,
+            "data-testid": "tm-cross-admit",
+            onClick: () => act(() => api.post(`${BASE$1}/cross/admit`, { peer: q.peer, room: h.room }), `${q.name}'s Bots joined`),
+            children: "Admit"
+          }
+        ),
+        /* @__PURE__ */ jsx(Btn, { disabled: busy, onClick: () => act(() => api.post(`${BASE$1}/cross/admit`, { peer: q.peer, room: h.room, approve: false }), "Declined"), children: "Decline" })
+      ] }, q.peer)),
+      h.peers.map((p) => /* @__PURE__ */ jsxs("div", { className: "tm-cross-line", "data-testid": "tm-cross-peer", children: [
+        /* @__PURE__ */ jsx(Check, { size: 13 }),
+        /* @__PURE__ */ jsx("b", { children: p.name }),
+        ": ",
+        p.bots.join(", ") || "no Bots",
+        p.trusted && /* @__PURE__ */ jsx(Badge, { variant: "ok", children: "may @ my Bots" }),
+        /* @__PURE__ */ jsxs(
+          Btn,
+          {
+            disabled: busy,
+            "data-testid": "tm-cross-remove",
+            onClick: () => act(() => api.post(`${BASE$1}/cross/remove`, { peer: p.peer, room: h.room }), `${p.name} removed`),
+            children: [
+              /* @__PURE__ */ jsx(UserMinus, { size: 13 }),
+              "Remove"
+            ]
+          }
+        )
+      ] }, p.peer))
+    ] }) }, h.room))
+  ] });
+}
+function JoinCard({ cross, bots, busy, act, api }) {
+  const [code, setCode] = useState("");
+  const [picked, setPicked] = useState([]);
+  const toggle = (id) => setPicked((p) => p.includes(id) ? p.filter((x) => x !== id) : [...p, id].slice(0, 3));
+  return /* @__PURE__ */ jsxs("div", { className: "tm-card", "data-testid": "tm-cross-join", children: [
+    /* @__PURE__ */ jsxs("div", { className: "tm-card-title", children: [
+      /* @__PURE__ */ jsx(UserPlus, { size: 15 }),
+      "Join another owner's group"
+    ] }),
+    /* @__PURE__ */ jsxs("label", { className: "tm-field", children: [
+      /* @__PURE__ */ jsx("span", { children: "Invite code they sent you" }),
+      /* @__PURE__ */ jsx(Input, { value: code, onChange: (e) => setCode(e.target.value), placeholder: "tmi1.…", "data-testid": "tm-cross-join-code" })
+    ] }),
+    /* @__PURE__ */ jsx("div", { className: "tm-muted", style: { margin: "6px 0" }, children: "Which of your Bots go in (up to 3):" }),
+    bots.length === 0 && /* @__PURE__ */ jsx("div", { className: "tm-muted", children: "Add a Bot on Members first." }),
+    bots.map((b) => /* @__PURE__ */ jsxs("label", { className: "tm-check", "data-testid": "tm-cross-join-bot", children: [
+      /* @__PURE__ */ jsx("input", { type: "checkbox", checked: picked.includes(b.lead_id), onChange: () => toggle(b.lead_id) }),
+      " ",
+      b.handle
+    ] }, b.lead_id)),
+    /* @__PURE__ */ jsx(
+      Btn,
+      {
+        primary: true,
+        disabled: busy || !code || !picked.length || !cross.name,
+        "data-testid": "tm-cross-join-send",
+        onClick: () => act(() => api.post(`${BASE$1}/cross/join`, { code: code.trim(), bots: picked }), "Asked to join. The host owner must admit you.").then((r) => {
+          if (r) {
+            setCode("");
+            setPicked([]);
+          }
+        }),
+        children: "Ask to join"
+      }
+    )
+  ] });
+}
+function JoinedCard({ cross, busy, act, api }) {
+  if (!cross.joined.length) return null;
+  const label = { joined: "joined", left: "left", removed: "removed by host" };
+  return /* @__PURE__ */ jsxs("div", { className: "tm-card", "data-testid": "tm-cross-joined", children: [
+    /* @__PURE__ */ jsxs("div", { className: "tm-card-title", children: [
+      /* @__PURE__ */ jsx(Users, { size: 15 }),
+      "Groups I joined"
+    ] }),
+    cross.joined.map((j) => /* @__PURE__ */ jsxs("div", { className: "tm-cross-line", "data-testid": "tm-cross-joined-row", children: [
+      /* @__PURE__ */ jsxs("b", { children: [
+        "#",
+        j.title
+      ] }),
+      " · host ",
+      j.hub_name,
+      " · ",
+      j.bots.join(", "),
+      " · ",
+      /* @__PURE__ */ jsx(Badge, { variant: j.state === "joined" ? j.synced ? "ok" : "warn" : "err", children: j.state === "joined" && !j.synced ? "waiting for the host to admit" : label[j.state] }),
+      j.state === "joined" && /* @__PURE__ */ jsxs(Btn, { disabled: busy, onClick: () => act(() => api.post(`${BASE$1}/cross/rooms/${j.room}/leave`, {}), "Left the group"), children: [
+        /* @__PURE__ */ jsx(LogOut, { size: 13 }),
+        "Leave"
+      ] })
+    ] }, j.room))
+  ] });
+}
+function PendingCard({ cross, busy, act, api }) {
+  if (!cross.pending.length) return null;
+  const answer = (p, approve, trust) => act(
+    () => api.post(`${BASE$1}/cross/pending/${p.pending_id}/answer`, { approve, trust }),
+    approve ? "Let through" : "Declined"
+  );
+  return /* @__PURE__ */ jsxs("div", { className: "tm-card is-warn", "data-testid": "tm-cross-pending", children: [
+    /* @__PURE__ */ jsxs("div", { className: "tm-card-title", children: [
+      /* @__PURE__ */ jsx(ShieldCheck, { size: 15 }),
+      "Another owner's Bot wants to give your Bots work"
+    ] }),
+    cross.pending.map((p) => /* @__PURE__ */ jsxs("div", { className: "tm-cross-line", "data-testid": "tm-cross-pending-row", children: [
+      /* @__PURE__ */ jsxs("div", { children: [
+        /* @__PURE__ */ jsx("b", { children: p.name }),
+        " in #",
+        p.title,
+        " @ ",
+        p.mentions.join(", "),
+        ": ",
+        /* @__PURE__ */ jsx("span", { className: "tm-break", children: p.text })
+      ] }),
+      /* @__PURE__ */ jsxs(Btn, { primary: true, disabled: busy, onClick: () => answer(p, true, true), "data-testid": "tm-cross-trust", children: [
+        "Allow, and trust ",
+        p.name
+      ] }),
+      /* @__PURE__ */ jsx(Btn, { disabled: busy, onClick: () => answer(p, true, false), children: "Allow once" }),
+      /* @__PURE__ */ jsx(Btn, { disabled: busy, onClick: () => answer(p, false, false), children: "Decline" })
+    ] }, p.pending_id))
+  ] });
+}
+function DroppedCard({ cross }) {
+  if (!cross.dropped.length) return null;
+  return /* @__PURE__ */ jsxs("div", { className: "tm-card", "data-testid": "tm-cross-dropped", children: [
+    /* @__PURE__ */ jsxs("div", { className: "tm-card-title", children: [
+      /* @__PURE__ */ jsx(ShieldAlert, { size: 15 }),
+      "Held back from your Bots"
+    ] }),
+    cross.dropped.map((d, i) => /* @__PURE__ */ jsxs("div", { className: "tm-cross-line", "data-testid": "tm-cross-dropped-row", children: [
+      /* @__PURE__ */ jsx(Badge, { variant: "err", children: REASON[d.reason] || d.reason }),
+      /* @__PURE__ */ jsx("span", { className: "tm-muted", children: new Date(d.ts * 1e3).toLocaleTimeString() }),
+      d.sample && /* @__PURE__ */ jsx("span", { className: "tm-mono tm-break", children: d.sample })
+    ] }, i))
   ] });
 }
 const STAGES = [
@@ -513,6 +824,7 @@ function whoName(who, leads) {
   if (who === OWNER$1) return OWNER_NAME;
   if (String(who).startsWith("bar_raiser")) return "Bar raiser";
   if (who === "app") return "Team Mode";
+  if (String(who).startsWith("peer:")) return "Other owner";
   return leads.get(who)?.handle || who;
 }
 const plural = (n, one, many) => `${n} ${n === 1 ? one : many || `${one}s`}`;
@@ -550,6 +862,7 @@ const TABS = [
   { key: "chat", label: "Chat", icon: MessagesSquare },
   { key: "needs", label: "Needs you", icon: Inbox },
   { key: "members", label: "Members", icon: Users },
+  { key: "cross", label: "Across owners", icon: Link2 },
   { key: "relay", label: "Tree relay", icon: Network },
   { key: "ledger", label: "Ledger", icon: ScrollText }
 ];
@@ -635,7 +948,7 @@ function TeamModePage() {
       "The backend did not answer: ",
       /* @__PURE__ */ jsx("span", { className: "tm-mono tm-break", children: error }),
       /* @__PURE__ */ jsx("div", { style: { marginTop: 10 }, children: /* @__PURE__ */ jsx(Btn, { onClick: () => poll(true), children: "Retry" }) })
-    ] }) : "Loading…" }) : tab === "chat" ? /* @__PURE__ */ jsx(ChatView, { state, leads, api, write, busy, focus, onNeeds: () => setTab("needs") }) : tab === "needs" ? /* @__PURE__ */ jsx("div", { className: "tm-body is-single", children: /* @__PURE__ */ jsx(NeedsYouView, { state, leads, waiting, api, write, busy, onOpen: openInChat }) }) : tab === "members" ? /* @__PURE__ */ jsx("div", { className: "tm-body is-single", children: /* @__PURE__ */ jsx(MembersView, { state, leads, api, write, busy }) }) : tab === "relay" ? /* @__PURE__ */ jsx("div", { className: "tm-body is-single", children: /* @__PURE__ */ jsx(RelayView, { state, leads }) }) : /* @__PURE__ */ jsx("div", { className: "tm-body is-single", children: /* @__PURE__ */ jsx(LedgerView, { state }) })
+    ] }) : "Loading…" }) : tab === "chat" ? /* @__PURE__ */ jsx(ChatView, { state, leads, api, write, busy, focus, onNeeds: () => setTab("needs") }) : tab === "needs" ? /* @__PURE__ */ jsx("div", { className: "tm-body is-single", children: /* @__PURE__ */ jsx(NeedsYouView, { state, leads, waiting, api, write, busy, onOpen: openInChat }) }) : tab === "members" ? /* @__PURE__ */ jsx("div", { className: "tm-body is-single", children: /* @__PURE__ */ jsx(MembersView, { state, leads, api, write, busy }) }) : tab === "cross" ? /* @__PURE__ */ jsx("div", { className: "tm-body is-single", children: /* @__PURE__ */ jsx(CrossOwnerView, { state, leads }) }) : tab === "relay" ? /* @__PURE__ */ jsx("div", { className: "tm-body is-single", children: /* @__PURE__ */ jsx(RelayView, { state, leads }) }) : /* @__PURE__ */ jsx("div", { className: "tm-body is-single", children: /* @__PURE__ */ jsx(LedgerView, { state }) })
   ] });
 }
 function ChatView({ state, leads, api, write, busy, focus, onNeeds }) {
@@ -840,9 +1153,13 @@ function ChannelHeader({ ch, leads, onCloseGroup }) {
         ] })
       ] }),
       !group && "Direct message · only the two sides and Owner can see it",
-      /* @__PURE__ */ jsx(Approx, { kind: "wake" })
+      /* @__PURE__ */ jsx(Approx, { kind: "wake" }),
+      ch.shared && /* @__PURE__ */ jsxs("span", { className: "tm-chip is-info", "data-testid": "tm-shared-chip", title: "Another owner's Bots are in this group. Their words reach your Bots as data.", children: [
+        /* @__PURE__ */ jsx(Users, { size: 12 }),
+        ch.mirror ? "Hosted by another owner" : "Shared with another owner"
+      ] })
     ] }),
-    group && (ch.closed ? /* @__PURE__ */ jsxs("span", { className: "tm-chip", "data-testid": "tm-group-closed", children: [
+    group && !ch.mirror && (ch.closed ? /* @__PURE__ */ jsxs("span", { className: "tm-chip", "data-testid": "tm-group-closed", children: [
       /* @__PURE__ */ jsx(Lock, { size: 12 }),
       "Closed"
     ] }) : /* @__PURE__ */ jsxs(Btn, { onClick: onCloseGroup, "data-testid": "tm-close-group", title: left ? `${plural(left, "item")} to clear first` : "Close this group", children: [

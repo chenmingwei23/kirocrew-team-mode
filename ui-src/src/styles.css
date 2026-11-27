@@ -442,3 +442,7 @@
 @media (max-width: 760px) { .tm-limit-grid { grid-template-columns: 1fr; } }
 .tm-link { color: var(--aim); text-decoration: underline; text-underline-offset: 2px; }
 .tm-impact li svg.lucide-check { color: var(--ok-text, var(--ok)); }
+/* Across owners (CrossOwnerView.jsx) */
+.tm-cross-line { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 6px 0; border-top: 1px solid var(--border); }
+.tm-cross-line:first-of-type { border-top: 0; }
+.tm-check { display: flex; align-items: center; gap: 6px; padding: 3px 0; cursor: pointer; }

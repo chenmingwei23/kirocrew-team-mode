@@ -94,6 +94,8 @@ def close_group(root: Path, cid: str, by: str = OWNER) -> dict:
             return _refused("no_such_channel")
         if ch.get("closed"):
             return _refused("group_closed")
+        if ledger.is_mirror(root, fold.channel_file(cid)):
+            return _refused("remote_group")  # the other owner hosts it; leave it from Across owners
         left = close_blockers(root, cid)
         if left["blocking"]:
             return _refused("open_items", **left)

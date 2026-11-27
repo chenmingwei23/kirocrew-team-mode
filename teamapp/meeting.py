@@ -1096,8 +1096,8 @@ def step_all(root: Path, now: float | None = None) -> int:
     now = time.time() if now is None else now
     n = 0
     for cid in fold.list_channels(root):
-        if not cid.startswith("G-"):
-            continue
+        if not cid.startswith("G-") or ledger.is_mirror(root, fold.channel_file(cid)):
+            continue  # another owner hosts a mirror; its host runs any meeting there
         rows = ledger.read(root, fold.channel_file(cid))
         for mid in meetings_in(rows):
             m = fold_meeting(rows, mid)
@@ -1193,11 +1193,17 @@ def convene(root: Path, sender: str, channel_id: str, title: str, agenda: list, 
             return _refused("group_closed")
         if sender not in ch["members"]:
             return _refused("not_a_member")
+        if ledger.is_mirror(root, fold.channel_file(channel_id)):
+            return _refused("meetings_local_only", advice="another owner hosts this group; meetings across "
+                                                          "owners are not in phase 1; end this turn")
         if _holds_turn(root, sender):
             return _refused("convene_inside_turn", advice="a follow-up meeting is an action item for the convener")
         for who in invitees:
             if who == sender:
                 return _refused("self_invite")
+            if leads.get(who, {}).get("kind") == "remote":
+                return _refused("meetings_local_only", who=who,
+                                advice="another owner's Bot cannot join a meeting in phase 1; invite your own Bots")
             if who not in leads:
                 return _refused("not_a_lead", who=who)
             if who not in ch["members"]:
@@ -1295,6 +1301,8 @@ def invite(root: Path, sender: str, meeting_id: str, invitee: str, now: float | 
         ch = fold.fold_channel(root, cid, rows)
         if invitee not in leads:
             return _refused("not_a_lead")
+        if leads[invitee].get("kind") == "remote":
+            return _refused("meetings_local_only")
         if invitee not in ch["members"]:
             return _refused("not_a_member")
         if invitee in m["speakers"] or m["invitees"].get(invitee, {}).get("state") == "invited":

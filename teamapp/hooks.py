@@ -261,8 +261,159 @@ async def _resume(request, ctx, root):
     return web.json_response({"status": "accepted", "stopped": limits.stopped(root)})
 
 
+# --------------------------------------------------------------------------- cross-owner groups
+
+
+def _cross_view(ctx: Any, root: Path) -> dict:
+    from . import fold, peer, pipe_slack
+
+    st = peer.fold(root)
+    leads = fold.directory(root)["leads"]
+    names = {p: r.get("name", "") for (p, _), r in st["requests"].items()}
+
+    def title(room):
+        try:
+            return fold.fold_channel(root, room)["title"]
+        except ledger.LedgerError:
+            return ""
+    hosted = []
+    for room in sorted(st["hosted"]):
+        hosted.append({
+            "room": room, "title": title(room),
+            "peers": [{"peer": p, "name": names.get(p, ""), "trusted": p in st["trusted"],
+                       "bots": [l["handle"] for l in leads.values() if l.get("peer") == p and l["active"]]}
+                      for (p, r) in st["admitted"] if r == room],
+            "requests": [{"peer": p, "name": q["name"], "bots": [b["handle"] for b in q["bots"]]}
+                         for (p, r), q in st["requests"].items() if r == room and q["state"] == "requested"]})
+    joined = [{"room": room, "title": j.get("title", ""), "hub_name": j.get("hub_name", ""), "state": j["state"],
+               "bots": [b["handle"] for b in j.get("bots", [])], "synced": ledger.tail_seq(root, fold.channel_file(room))}
+              for room, j in sorted(st["joined"].items())]
+    pending = [{"pending_id": k, "name": names.get(p["peer"], ""), "room": p["room"], "title": title(p["room"]),
+                "text": str(p["post"].get("text", ""))[:300],
+                "mentions": [leads.get(m, {}).get("handle", m) for m in p["post"].get("mentions") or []]}
+               for k, p in st["pending"].items() if p["state"] == "pending"]
+    outbox = {s: sum(1 for o in st["outbox"].values() if o["state"] == s) for s in ("queued", "sent", "refused")}
+    try:
+        me = peer.self_id(root) if st["name"] else ""
+    except peer.PeerError:
+        me = ""
+    return {"self": me, "name": st["name"], "channel": st["channel"],
+            "token_set": pipe_slack.token_path(Path(ctx.data_dir)).exists(),
+            "hosted": hosted, "joined": joined, "pending": pending, "outbox": outbox,
+            "dropped": [{k: d.get(k) for k in ("peer", "room", "reason", "sample", "ts")}
+                        for d in st["dropped"][-20:]][::-1]}
+
+
+def _cross(op: str):
+    """Owner-only, with a peer refusal turned into a 409."""
+    def wrap(fn):
+        @_owner(op)
+        async def handler(request, ctx, root):
+            from . import peer
+            try:
+                return await fn(request, ctx, root)
+            except (peer.PeerError, identity.IdentityError) as exc:
+                return web.json_response({"status": "refused", "reason": exc.code}, status=409)
+        return handler
+    return wrap
+
+
+@_cross("cross.view")
+async def _cross_get(request, ctx, root):
+    return web.json_response(await asyncio.to_thread(_cross_view, ctx, root))
+
+
+@_cross("cross.setup")
+async def _cross_setup(request, ctx, root):
+    from . import peer, pipe_slack
+
+    body = await _body(request)
+    _only(body, {"name", "channel", "token"})
+    if body.get("token"):
+        try:
+            pipe_slack.save_token(Path(ctx.data_dir), body["token"])
+        except ValueError:
+            return web.json_response({"status": "refused", "reason": "bad_token"}, status=409)
+    await asyncio.to_thread(peer.configure, root, body.get("name"), body.get("channel"))
+    return web.json_response({"status": "accepted"})
+
+
+@_cross("cross.invite")
+async def _cross_invite(request, ctx, root):
+    from . import fold, peer
+
+    body = await _body(request)
+    _only(body, {"channel_id"})
+    room = body.get("channel_id")
+    if not isinstance(room, str) or not room.startswith("G-"):
+        return web.json_response({"status": "refused", "reason": "not_a_group"}, status=409)
+    try:
+        ch = fold.fold_channel(root, room)
+    except ledger.LedgerError:
+        return web.json_response({"status": "refused", "reason": "no_such_channel"}, status=409)
+    if ch["kind"] != "group" or ch.get("closed") or ledger.is_mirror(root, fold.channel_file(room)):
+        return web.json_response({"status": "refused", "reason": "not_your_group"}, status=409)
+    code = await asyncio.to_thread(peer.make_invite, root, room, ch["title"])
+    return web.json_response({"status": "accepted", "code": code})
+
+
+@_cross("cross.join")
+async def _cross_join(request, ctx, root):
+    from . import crossowner
+
+    body = await _body(request)
+    _only(body, {"code", "bots"})
+    return web.json_response(await asyncio.to_thread(crossowner.join, root, str(body.get("code", "")),
+                                                     body.get("bots")))
+
+
+@_cross("cross.admit")
+async def _cross_admit(request, ctx, root):
+    from . import crossowner
+
+    body = await _body(request)
+    _only(body, {"peer", "room", "approve"})
+    fn = crossowner.admit if body.get("approve", True) else crossowner.reject
+    return _result(await asyncio.to_thread(fn, root, str(body.get("peer", "")), str(body.get("room", ""))))
+
+
+@_cross("cross.remove")
+async def _cross_remove(request, ctx, root):
+    from . import crossowner
+
+    body = await _body(request)
+    _only(body, {"peer", "room"})
+    return _result(await asyncio.to_thread(crossowner.remove, root, str(body.get("peer", "")),
+                                           str(body.get("room", ""))))
+
+
+@_cross("cross.leave")
+async def _cross_leave(request, ctx, root):
+    from . import crossowner
+
+    return _result(await asyncio.to_thread(crossowner.leave, root, request.match_info.get("room", "")))
+
+
+@_cross("cross.pending")
+async def _cross_pending(request, ctx, root):
+    from . import crossowner
+
+    body = await _body(request)
+    _only(body, {"approve", "trust"})
+    return _result(await asyncio.to_thread(crossowner.answer_pending, root, request.match_info.get("pid", ""),
+                                           body.get("approve") is True, body.get("trust") is True))
+
+
 def register_routes(ctx: Any) -> list[Route]:
     return [
+        Route("GET", "/cross", _cross_get),
+        Route("POST", "/cross/setup", _cross_setup),
+        Route("POST", "/cross/invite", _cross_invite),
+        Route("POST", "/cross/join", _cross_join),
+        Route("POST", "/cross/admit", _cross_admit),
+        Route("POST", "/cross/remove", _cross_remove),
+        Route("POST", "/cross/rooms/{room}/leave", _cross_leave),
+        Route("POST", "/cross/pending/{pid}/answer", _cross_pending),
         Route("GET", "/health", _health),
         Route("GET", "/state", _state),
         Route("GET", "/channels/{id}", _channel),
@@ -288,18 +439,47 @@ def register_routes(ctx: Any) -> list[Route]:
 _tasks: dict[str, tuple[asyncio.Task, asyncio.Event]] = {}
 
 
+def _dev_pipe(ctx: Any, channel: str):
+    """DEV ONLY: ``dev/pipe_file.py`` when ``<data dir>/dev-pipe`` names a shared file
+    (two test gateways on one host, no Slack). Without that file: None, the real pipe."""
+    marker = Path(ctx.data_dir) / "dev-pipe"
+    if not marker.is_file():
+        return None
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "team_mode_dev_pipe", Path(__file__).resolve().parents[1] / "dev" / "pipe_file.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    import logging
+    logging.getLogger("kirocrew.app.team-mode").warning("team-mode: DEV pipe in use (%s), not Slack", marker)
+    return mod.FilePipe(Path(marker.read_text().strip()), channel)
+
+
 async def on_startup(ctx: Any) -> None:
     root = ledger_root(ctx)
     ledger.append(root, limits.CONTROL, "app/started", "app", {})
     stop = asyncio.Event()
     task = asyncio.create_task(wake.run_loop(ctx, root, stop), name="team-mode-wake-loop")
     _tasks[str(root)] = (task, stop)
+    from . import crossowner, pipe_slack
+
+    pipes: dict[str, Any] = {}
+
+    def pipe_for(channel: str):
+        if channel not in pipes:
+            pipes[channel] = _dev_pipe(ctx, channel) or pipe_slack.SlackPipe(Path(ctx.data_dir), channel)
+        return pipes[channel]
+    cross = asyncio.create_task(crossowner.run_loop(ctx, root, pipe_for, stop), name="team-mode-cross-owner")
+    _tasks[str(root) + "#cross"] = (cross, stop)
 
 
 async def on_shutdown(ctx: Any) -> None:
     root = ledger_root(ctx)
-    entry = _tasks.pop(str(root), None)
-    if entry is not None:
+    for key in (str(root), str(root) + "#cross"):
+        entry = _tasks.pop(key, None)
+        if entry is None:
+            continue
         task, stop = entry
         stop.set()
         try:

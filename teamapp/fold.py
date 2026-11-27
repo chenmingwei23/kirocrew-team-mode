@@ -52,8 +52,12 @@ _LEAD_ID_RE = re.compile(r"(?:\blead:)?\bL-[0-9a-f]{8}\b")
 
 
 def handles(root: Path) -> dict[str, str]:
-    """lead id -> handle (the id itself when a lead has no handle)."""
-    return {lid: lead.get("handle") or lid for lid, lead in directory(root)["leads"].items()}
+    """lead id -> handle (the id itself when a lead has no handle). The other owner of a
+    shared group (``peer:P-x``, whose Bots this directory lists) reads "Other owner"."""
+    leads = directory(root)["leads"]
+    out = {f"peer:{l['peer']}": "Other owner" for l in leads.values() if l.get("peer")}
+    out.update({lid: lead.get("handle") or lid for lid, lead in leads.items()})
+    return out
 
 
 def display_by(by: object, names: dict[str, str]) -> object:
@@ -148,7 +152,8 @@ def directory(root: Path) -> dict:
     """``{leads: {lead_id: {...}}, by_label: {label: lead_id}}``.
 
     A lead's ``kind`` is ``bot`` (an existing Bot; ``bot`` = its crew key, ``project``
-    = its workspace name) or ``chat`` (legacy lead chat). Old ``directory/seen`` rows
+    = its workspace name), ``chat`` (legacy lead chat) or ``remote`` (another owner's
+    Bot in a cross-owner group; ``peer`` = that owner's gateway, never woken here). Old ``directory/seen`` rows
     from before Bots are ignored."""
     leads: dict[str, dict] = {}
     by_label: dict[str, str] = {}
@@ -158,7 +163,7 @@ def directory(root: Path) -> dict:
             leads[d["lead_id"]] = {"lead_id": d["lead_id"], "handle": d.get("handle", ""),
                                    "session_label": d["session_label"], "kind": d.get("kind", "chat"),
                                    "bot": d.get("bot", ""), "project": d.get("project", ""),
-                                   "registered_ts": row["ts"], "active": True}
+                                   "peer": d.get("peer", ""), "registered_ts": row["ts"], "active": True}
             by_label[d["session_label"]] = d["lead_id"]
         elif row["type"] == "lead/retired":
             lead = leads.get(d.get("lead_id", ""))
@@ -175,7 +180,7 @@ def _empty_channel(channel_id: str) -> dict:
     return {"id": channel_id, "kind": "", "title": "", "members": [], "people": [], "creator": "",
             "managers": [], "bar_raiser": "default", "threads": {}, "messages": {}, "held": [],
             "assignments": {}, "cooling_until": 0.0, "seq": 0, "opened_ts": 0.0,
-            "revealed": [], "ballots_closed": [], "closed": False}
+            "revealed": [], "ballots_closed": [], "closed": False, "shared": False}
 
 
 def _apply(state: dict, row: dict) -> None:
@@ -252,6 +257,8 @@ def _apply(state: dict, row: dict) -> None:
                 a["binding"] = d["binding"]  # (msg seq, ask hash, attempt) the take is bound to
     elif t == "channel/closed":
         state["closed"] = True
+    elif t == "channel/shared":
+        state["shared"] = True  # a cross-owner group (shared_rules.py)
     elif t == "channel/cooling":
         state["cooling_until"] = float(d.get("until", 0))
     elif t == "agenda/round_revealed":

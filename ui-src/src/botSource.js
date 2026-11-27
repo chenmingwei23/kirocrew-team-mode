@@ -84,7 +84,10 @@ export function leadForBot(bot, leads) {
 
 /** `{ kind, label }` a page shows for a lead: Bot, or the old lead chat. */
 export function leadKind(lead) {
-  return lead?.kind === 'bot' ? { kind: 'bot', label: 'Bot' } : { kind: 'legacy', label: 'Legacy lead' }
+  if (lead?.kind === 'bot') return { kind: 'bot', label: 'Bot' }
+  // another owner's Bot in a shared group (cross-owner): its own gateway wakes it
+  if (lead?.kind === 'remote') return { kind: 'remote', label: "Other owner's Bot" }
+  return { kind: 'legacy', label: 'Legacy lead' }
 }
 
 /** What Add does for one Bot row: `{ ok: true }` or `{ ok: false, why }` in plain words. */

@@ -34,10 +34,11 @@ export default function LeadsNowCard({ state, avatar, onOpen, bots = null }) {
                   <b className="tm-now-name">{c.name}</b>
                   <span className={`tm-now-status ${c.tone}`}>{c.label}{age && <span className="tm-now-age"> · {age}</span>}</span>
                 </span>
-                {(c.project || c.legacy) && (
+                {(c.project || c.legacy || c.remote) && (
                   <span className="tm-now-tags">
                     {c.project && <span className="tm-now-project" title={`Project: ${c.project}`}>{c.project}</span>}
                     {c.legacy && <span className="tm-now-project is-legacy" title="An old lead chat, not a Bot">Legacy lead</span>}
+                    {c.remote && <span className="tm-now-project" title="Another owner's Bot: its own gateway wakes it">Other owner's Bot</span>}
                   </span>
                 )}
                 <span className="tm-now-why">{reason}{c.more > 0 && <span className="tm-muted"> · +{c.more} more</span>}</span>

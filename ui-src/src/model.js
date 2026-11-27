@@ -547,7 +547,7 @@ export function appLeadSource(state) {
       role: typeof l.duty === 'string' ? l.duty : '',
       project: typeof l.project === 'string' ? l.project : '',
       kind: leadKindLabel(l.kind),
-      legacy: l.kind !== 'bot',
+      legacy: l.kind !== 'bot' && l.kind !== 'remote',
       slotKey: label.startsWith('dashboard:') ? label.slice('dashboard:'.length) : null,
       workers: cleanWorkers(l.workers),
     }

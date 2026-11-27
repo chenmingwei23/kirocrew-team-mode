@@ -34,11 +34,14 @@ VERSION = 1
 
 # Files a caller may name. Everything is relative to root; no "..", no absolute path.
 _FILE_RE = re.compile(
-    r"^(directory|cases|control|decisions)\.jsonl$"
+    r"^(directory|cases|control|decisions|peers)\.jsonl$"
     r"|^channels/[GD]-[0-9a-f]{8}\.jsonl$"
     r"|^members/L-[0-9a-f]{8}\.jsonl$"
 )
-_BY_RE = re.compile(r"^(owner|app|lead:L-[0-9a-f]{8}|bar_raiser:[A-Za-z0-9_-]{1,64}|secretary:[A-Za-z0-9_-]{1,64})$")
+# ``peer:P-x`` is another owner's gateway (cross-owner groups, ``peer.py``): on a mirror
+# it stands where the hub's own ``owner`` stood, so the two owners never read as one.
+_BY_RE = re.compile(r"^(owner|app|lead:L-[0-9a-f]{8}|peer:P-[0-9a-f]{8}|bar_raiser:[A-Za-z0-9_-]{1,64}"
+                    r"|secretary:[A-Za-z0-9_-]{1,64})$")
 _TYPE_RE = re.compile(r"^[a-z_]+/[a-z_]+$")
 
 MAX_ROW_BYTES = 256 * 1024
@@ -159,6 +162,23 @@ def _write(path: Path, payload: bytes) -> None:
         os.close(fd)
 
 
+def _mirror_marker(root: Path, file: str) -> Path:
+    return Path(root) / "mirrors" / Path(file).name
+
+
+def is_mirror(root: Path, file: str) -> bool:
+    """True for a channel this gateway only mirrors (another owner hosts it): only
+    :func:`append_copy` writes it, so its seqs stay the hub's."""
+    return _mirror_marker(root, file).exists()
+
+
+def mark_mirror(root: Path, file: str) -> None:
+    check_file(file)
+    path = _mirror_marker(root, file)
+    path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    path.touch(mode=0o600, exist_ok=True)
+
+
 def append(root: Path, file: str, type: str, by: str, data: dict, *, now: float | None = None) -> int:
     """Append one row; return its seq. Taken under the write lock."""
     return append_many(root, [(file, type, by, data)], now=now)[0]
@@ -176,6 +196,8 @@ def append_many(root: Path, rows: list[tuple[str, str, str, dict]], *, now: floa
         seqs: list[int] = []
         for file, type, by, data in rows:
             check_file(file)
+            if is_mirror(root, file):
+                raise LedgerError(f"{file}: mirror of another owner's group; only the host writes it")
             if file not in tails:
                 tails[file] = tail_seq(root, file)
             tails[file] += 1
@@ -187,6 +209,28 @@ def append_many(root: Path, rows: list[tuple[str, str, str, dict]], *, now: floa
         for file, payload in grouped.items():
             _write(root / file, payload)
         return seqs
+
+
+def append_copy(root: Path, file: str, rows: list[dict]) -> int:
+    """Append rows another gateway already numbered (a cross-owner mirror, ``peer.py``).
+
+    Each row keeps its own ``seq`` and ``ts``; the first must be the file's tail + 1 and
+    the rest follow by exactly 1, else :class:`LedgerError` and nothing is written.
+    Returns the new tail seq."""
+    root = Path(root)
+    with transaction(root):
+        check_file(file)
+        tail = tail_seq(root, file)
+        payload = b""
+        for row in rows:
+            if not isinstance(row, dict) or row.get("seq") != tail + 1:
+                raise LedgerError(f"{file}: copied row out of order (want seq {tail + 1})")
+            line = _row(tail + 1, row.get("type"), row.get("by"), row.get("data"), float(row.get("ts") or 0))
+            payload += line
+            tail += 1
+        if payload:
+            _write(root / file, payload)
+        return tail
 
 
 def list_files(root: Path, prefix: str) -> list[str]:

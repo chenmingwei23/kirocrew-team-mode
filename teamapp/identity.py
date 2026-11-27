@@ -120,6 +120,41 @@ def register(root: Path, label: str, handle: str, kind: str = "chat") -> str:
         return lead_id
 
 
+_LEAD_ID_RE = re.compile(r"^L-[0-9a-f]{8}$")
+_PEER_RE = re.compile(r"^P-[0-9a-f]{8}$")
+
+
+def remote_label(peer: str, lead_id: str) -> str:
+    return f"remote:{peer}/{lead_id}"
+
+
+def register_remote(root: Path, lead_id: str, handle: str, peer: str, owner_name: str) -> str:
+    """Add another owner's Bot (cross-owner group) under the id its own gateway gave it,
+    so rows read the same on both gateways. Its handle gets ``.<owner_name>`` so two
+    owners' "Sage" never collide. It has no ``bot`` key: this gateway never wakes it.
+    Idempotent for the same (peer, lead_id); returns the handle used."""
+    if not (isinstance(lead_id, str) and _LEAD_ID_RE.match(lead_id)) or not (
+            isinstance(peer, str) and _PEER_RE.match(peer)):
+        raise IdentityError("bad_remote_lead")
+    base = re.sub(r"[^A-Za-z0-9._-]", "", f"{handle}.{owner_name}")[:40] or lead_id
+    with ledger.transaction(root):
+        d = fold.directory(root)
+        old = d["leads"].get(lead_id)
+        if old is not None:
+            if old.get("peer") != peer:
+                raise IdentityError("lead_id_taken")
+            if old["active"]:
+                return old["handle"]
+        taken = {l["handle"] for l in d["leads"].values() if l["active"]}
+        name, n = base, 2
+        while name in taken:
+            name, n = f"{base[:37]}-{n}", n + 1
+        ledger.append(root, DIRECTORY, "lead/registered", "app",
+                      {"lead_id": lead_id, "handle": name, "session_label": remote_label(peer, lead_id),
+                       "kind": "remote", "peer": peer})
+        return name
+
+
 def retire(root: Path, lead_id: str) -> None:
     with ledger.transaction(root):
         lead = fold.directory(root)["leads"].get(lead_id)

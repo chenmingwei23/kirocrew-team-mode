@@ -16,7 +16,7 @@ import secrets
 import time
 from pathlib import Path
 
-from . import decisions, fold, identity, ledger, limits
+from . import decisions, fold, identity, ledger, limits, shared_rules
 
 OWNER = fold.OWNER
 CONTROL = limits.CONTROL
@@ -106,6 +106,8 @@ def _open_dm(root: Path, sender: str, to: str, now: float) -> tuple[str | None, 
         return None, _refused("not_a_lead")
     if sender != OWNER and sender not in leads:
         return None, _refused("not_a_lead")
+    if "remote" in (leads.get(to, {}).get("kind"), leads.get(sender, {}).get("kind")):
+        return None, _refused("remote_dm", advice="DMs across owners are not in phase 1; write in the shared group")
     if to == sender:
         return None, _refused("dm_self")
     cid = _find_dm(root, sender, to)
@@ -142,6 +144,8 @@ def open_group(root: Path, creator: str, title: str, members: list[str],
                 members.insert(0, creator)
         if any(m not in leads for m in members) or any(m not in members for m in managers):
             return _refused("not_a_lead")
+        if any(leads[m].get("kind") == "remote" for m in members):
+            return _refused("remote_lead_needs_invite")
         if not (limits.GROUP_MIN <= len(members) <= limits.GROUP_MAX):
             return _refused("group_size", limit=f"{limits.GROUP_MIN}-{limits.GROUP_MAX} leads")
         # Opening the same group twice reuses it (agent-org-chart PROTOCOL.md "created vs reused").
@@ -188,10 +192,14 @@ def change_members(root: Path, channel_id: str, add: list[str], remove: list[str
             return _refused("group_closed")
         if by != OWNER and by not in ch["managers"]:
             return _refused("not_allowed")
+        if ledger.is_mirror(root, fold.channel_file(channel_id)):
+            return _refused("remote_group", advice="another owner hosts this group")
         leads = identity.active_leads(root)
         final = [m for m in ch["members"] if m not in remove] + [a for a in add if a not in ch["members"]]
         if any(a not in leads for a in add):
             return _refused("not_a_lead")
+        if any(leads[a].get("kind") == "remote" for a in add):
+            return _refused("remote_lead_needs_invite")
         if not (limits.GROUP_MIN <= len(final) <= limits.GROUP_MAX):
             return _refused("group_size", limit=f"{limits.GROUP_MIN}-{limits.GROUP_MAX} leads")
         rows = [(fold.channel_file(channel_id), "member/added", _by(by), {"who": a, "by": by})
@@ -266,6 +274,11 @@ def post(root: Path, sender: str, *, text: str, channel_id: str | None = None, t
         return _refused("self_mention")
     if (channel_id is None) == (to is None):
         return _refused("need_channel_or_to")
+    if isinstance(channel_id, str) and channel_id.startswith("G-") \
+            and ledger.is_mirror(root, fold.channel_file(channel_id)):
+        return _post_to_hub(root, sender, channel_id, text=text, thread=thread, root_seq=root_seq,
+                            also_main=also_main, mentions=mentions, cc=cc, everyone=everyone, answers=answers,
+                            response=response, reason=reason, reply_to=reply_to, kind=kind, summon_br=summon_br)
 
     with ledger.transaction(root):
         if limits.stopped(root):
@@ -295,6 +308,28 @@ def post(root: Path, sender: str, *, text: str, channel_id: str | None = None, t
             return _refused("group_closed")
         if not is_owner and sender not in ch["members"]:
             return _refused("not_a_member")
+        # a group another owner shares (shared_rules.py, after Joe's plan v3)
+        ask_human = False
+        if ch.get("shared"):
+            mark = "" if is_owner else shared_rules.marker(text)
+            if mark == "pass":
+                return {"status": "accepted", "passed": True, "advice": "nothing was posted; end this turn"}
+            if not is_owner:
+                why = shared_rules.refusal(rows, now)
+                if why:
+                    if why != "waiting_for_person" and not shared_rules.counts(rows, now)["paused"]:
+                        ledger.append(root, file, "message/posted", "app",
+                                      {"msg_id": _new_id("M"), "thread_id": None, "kind": "pause", "mentions": [],
+                                       "cc": [], "everyone": False, "also_main": False, "reply_to": None,
+                                       "answers": None, "chain": None, "text": shared_rules.pause_text(why)},
+                                      now=now)
+                    return _refused(why, advice="a person must speak in this group first; end this turn")
+            text = shared_rules.clean(text)
+            if not text:
+                return _refused("empty_text")
+            if mark == "ask_human":
+                ask_human = True
+                text += f"\n\nWaiting for {_owner_name(root, sender)}."
         if ch["kind"] == "dm" and (thread not in (None, "main") or mentions or cc or everyone or summon_br):
             return _refused("dm_main_only")
         out_rows: list[tuple[str, str, str, dict]] = []
@@ -465,7 +500,7 @@ def post(root: Path, sender: str, *, text: str, channel_id: str | None = None, t
             "msg_id": msg_id, "thread_id": thread_id, "text": text, "kind": kind,
             "mentions": mentions + ([BAR_RAISER] if summon_br else []),
             "cc": cc, "everyone": bool(everyone), "also_main": bool(also_main), "reply_to": reply_to,
-            "answers": answer, "chain": chain}))
+            "answers": answer, "chain": chain, **({"ask_human": True} if ask_human else {})}))
         if hold_reason:
             out_rows.append((file, "message/held", "app", {"msg_id": msg_id, "reason": hold_reason}))
         else:
@@ -521,6 +556,59 @@ def post(root: Path, sender: str, *, text: str, channel_id: str | None = None, t
             result.update(reason=hold_reason, advice="end this turn; the room's bar raiser will decide"
                           if hold_reason == "hop_limit" else limits.ADVICE_STOP)
         return result
+
+
+def _owner_name(root: Path, lead_id: str) -> str:
+    """The short name of the owner whose Bot ``lead_id`` is (for "Waiting for <name>.")."""
+    from . import peer
+
+    st = peer.fold(root)
+    lead = identity.active_leads(root).get(lead_id, {})
+    if lead.get("kind") == "remote":
+        for (p, _room), req in st["requests"].items():
+            if p == lead.get("peer"):
+                return req.get("name") or "the other owner"
+        return "the other owner"
+    return st["name"] or "the owner"
+
+
+def _post_to_hub(root: Path, sender: str, channel_id: str, *, text: str, thread, root_seq, also_main, mentions,
+                 cc, everyone, answers, response, reason, reply_to, kind, summon_br) -> dict:
+    """A post in a group another owner hosts (``peer.py``). Only the host's ``post``
+    admits it, so here it is only checked enough to fail fast, then queued for the
+    pipe loop. Nothing is written to the mirror: the host's signed copy comes back."""
+    from . import peer
+
+    if everyone or summon_br:
+        return _refused("remote_group_limits", advice="@everyone and the bar raiser stay with the host's owner")
+    if sender != OWNER and shared_rules.marker(text) == "pass":
+        return {"status": "accepted", "passed": True, "advice": "nothing was posted; end this turn"}
+    with ledger.transaction(root):
+        if limits.stopped(root):
+            return _refused("stopped")
+        if not peer.mirror_open(peer.fold(root), channel_id):
+            return _refused("group_closed", advice="you are no longer in this group; end this turn")
+        rows = ledger.read(root, fold.channel_file(channel_id))
+        if sender == OWNER:
+            # the other owner is a person here: text only, it resets the Bot post count on both sides
+            out_id = peer.queue(root, channel_id, "say", {"text": text})
+            return {"status": "accepted", "queued": True, "out_id": out_id, "channel_id": channel_id}
+        ch = fold.fold_channel(root, channel_id, rows)
+        if sender not in ch["members"]:
+            return _refused("not_a_member")
+        for who in mentions + cc:
+            if who not in ch["members"]:
+                return _refused("not_a_member", who=who)
+        why = shared_rules.refusal(rows, time.time())
+        if why:
+            return _refused(why, advice="a person must speak in this group first; end this turn")
+        out_id = peer.queue(root, channel_id, "post", {
+            "lead": sender, "text": text, "thread": thread, "root_seq": root_seq, "also_main": bool(also_main),
+            "mentions": mentions, "cc": cc, "answers": answers, "response": response, "reason": reason,
+            "reply_to": reply_to, "kind": kind})
+    return {"status": "accepted", "queued": True, "out_id": out_id, "channel_id": channel_id,
+            "advice": "sent to the gateway of the owner who hosts this group; it shows in the group once that "
+                      "host admits it. Do not resend; end this turn."}
 
 
 def relay_note(root: Path, sender: str, channel_id: str, from_session: str, via_session: str,
