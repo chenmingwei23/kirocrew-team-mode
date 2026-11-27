@@ -219,6 +219,23 @@ def test_markers_limit_and_labels(tmp_path):
     assert send.post(s.b, s.rivet, channel_id=s.g, text="thanks")["queued"] is True
 
 
+def test_dev_file_pipe_has_the_slack_pipe_interface(tmp_path):
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("pipe_file", APP / "dev" / "pipe_file.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    pipe = mod.FilePipe(tmp_path / "pipe.jsonl", CHANNEL)
+    other = mod.FilePipe(tmp_path / "pipe.jsonl", "C0OTHERCH1")
+    assert pipe.ready()
+    t1 = _run(pipe.post("one"))
+    _run(other.post("not mine"))
+    t2 = _run(pipe.post("two"))
+    assert float(t2) > float(t1)
+    assert [m["text"] for m in _run(pipe.read("0"))] == ["one", "two"]
+    assert [m["text"] for m in _run(pipe.read(t1))] == ["two"]
+
+
 def test_remove_peer_and_scrub_outbound(tmp_path):
     s = _setup(tmp_path)
     _admit(s)

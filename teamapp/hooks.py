@@ -439,6 +439,23 @@ def register_routes(ctx: Any) -> list[Route]:
 _tasks: dict[str, tuple[asyncio.Task, asyncio.Event]] = {}
 
 
+def _dev_pipe(ctx: Any, channel: str):
+    """DEV ONLY: ``dev/pipe_file.py`` when ``<data dir>/dev-pipe`` names a shared file
+    (two test gateways on one host, no Slack). Without that file: None, the real pipe."""
+    marker = Path(ctx.data_dir) / "dev-pipe"
+    if not marker.is_file():
+        return None
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "team_mode_dev_pipe", Path(__file__).resolve().parents[1] / "dev" / "pipe_file.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    import logging
+    logging.getLogger("kirocrew.app.team-mode").warning("team-mode: DEV pipe in use (%s), not Slack", marker)
+    return mod.FilePipe(Path(marker.read_text().strip()), channel)
+
+
 async def on_startup(ctx: Any) -> None:
     root = ledger_root(ctx)
     ledger.append(root, limits.CONTROL, "app/started", "app", {})
@@ -451,7 +468,7 @@ async def on_startup(ctx: Any) -> None:
 
     def pipe_for(channel: str):
         if channel not in pipes:
-            pipes[channel] = pipe_slack.SlackPipe(Path(ctx.data_dir), channel)
+            pipes[channel] = _dev_pipe(ctx, channel) or pipe_slack.SlackPipe(Path(ctx.data_dir), channel)
         return pipes[channel]
     cross = asyncio.create_task(crossowner.run_loop(ctx, root, pipe_for, stop), name="team-mode-cross-owner")
     _tasks[str(root) + "#cross"] = (cross, stop)
