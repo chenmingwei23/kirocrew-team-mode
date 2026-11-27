@@ -162,7 +162,7 @@ export function leadsNow(state, roster, now, waiting = []) {
       target: lp ? { channel_id: lp.cid, thread_id: lp.thread_id } : null,
     }
     const s = STATUS[top.status]
-    return { id: l.id, name: l.name, project: l.project || null, legacy: !!l.legacy, status: top.status, label: s.label, tone: s.tone, reason: top.reason, since: top.since,
+    return { id: l.id, name: l.name, project: l.project || null, legacy: !!l.legacy, remote: !!l.remote, status: top.status, label: s.label, tone: s.tone, reason: top.reason, since: top.since,
       target: top.target, more: Math.max(0, list.length - 1), posts: posts.get(l.id) || 0, lastTs: lp?.ts ?? null }
   })
   cards.sort((a, b) => byNeed(a, b) || a.name.localeCompare(b.name))

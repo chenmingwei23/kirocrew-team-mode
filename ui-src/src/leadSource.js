@@ -36,8 +36,9 @@ export function leadRoster(state, bots = null) {
       id: l.lead_id,
       name: b?.name || shortHandle(l.handle) || 'lead',
       project: b?.project || l.project || null,
-      legacy: l.kind !== 'bot',
+      legacy: l.kind !== 'bot' && l.kind !== 'remote',
       workers: b?.workers ?? null,
+      ...(l.kind === 'remote' ? { remote: true } : {}), // another owner's Bot in a shared group
     }
   })
 }

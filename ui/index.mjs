@@ -133,6 +133,7 @@ function leadsNow(state, roster, now, waiting = []) {
       name: l.name,
       project: l.project || null,
       legacy: !!l.legacy,
+      remote: !!l.remote,
       status: top.status,
       label: s.label,
       tone: s.tone,
@@ -185,8 +186,10 @@ function leadRoster(state, bots = null) {
       id: l.lead_id,
       name: b?.name || shortHandle(l.handle) || "lead",
       project: b?.project || l.project || null,
-      legacy: l.kind !== "bot",
-      workers: b?.workers ?? null
+      legacy: l.kind !== "bot" && l.kind !== "remote",
+      workers: b?.workers ?? null,
+      ...l.kind === "remote" ? { remote: true } : {}
+      // another owner's Bot in a shared group
     };
   });
 }
@@ -298,9 +301,10 @@ function LeadsNowCard({ state, avatar, onOpen, bots = null }) {
               ] })
             ] })
           ] }),
-          (c.project || c.legacy) && /* @__PURE__ */ jsxs("span", { className: "tm-now-tags", children: [
+          (c.project || c.legacy || c.remote) && /* @__PURE__ */ jsxs("span", { className: "tm-now-tags", children: [
             c.project && /* @__PURE__ */ jsx("span", { className: "tm-now-project", title: `Project: ${c.project}`, children: c.project }),
-            c.legacy && /* @__PURE__ */ jsx("span", { className: "tm-now-project is-legacy", title: "An old lead chat, not a Bot", children: "Legacy lead" })
+            c.legacy && /* @__PURE__ */ jsx("span", { className: "tm-now-project is-legacy", title: "An old lead chat, not a Bot", children: "Legacy lead" }),
+            c.remote && /* @__PURE__ */ jsx("span", { className: "tm-now-project", title: "Another owner's Bot: its own gateway wakes it", children: "Other owner's Bot" })
           ] }),
           /* @__PURE__ */ jsxs("span", { className: "tm-now-why", children: [
             reason,
