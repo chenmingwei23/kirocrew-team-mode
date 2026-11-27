@@ -175,7 +175,7 @@ export function chatToolsBody(view, crew, on) {
 
 /**
  * Remove takes a Bot out of the team, and nothing it was given for the team stays
- * behind: retire the lead (the backend also drops its wake job), then untick the Bot
+ * behind: retire the lead (the wake loop stops waking it), then untick the Bot
  * for this app so its own chat loses the team tools. The list is the host's owner-only
  * route, which the app backend cannot write, so the page does it with the owner's
  * session. Other ticked Bots are kept. A legacy lead (`crew` empty) has no switch.

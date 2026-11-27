@@ -4,9 +4,11 @@
 channel folds and the clock: no model, no I/O. The loop (:func:`run_loop`, started
 by ``hooks.on_startup``) runs every 2 seconds: unanswered assignments -> bar raiser
 ``detect`` / ``summon`` / ``apply_due`` -> ``next_wake`` for each lead -> budget charge
--> secretary brief -> ``wake/due``. A lead's own script cron (``crons/inbox_probe.py``)
+-> secretary brief -> ``wake/due``. A Bot lead is then woken at once through the host's
+``POST /api/members/{id}/wake`` (``bot_wake``); the result is written as ``wake/sent``
+or ``wake/refused``. A legacy lead chat's own script cron (``crons/inbox_probe.py``)
 sees the new ``wake/due`` within about 60 seconds and wakes its session with a fixed
-pointer text; the session then calls ``team_inbox_read``, which acknowledges.
+pointer text. Either way the session then calls ``team_inbox_read``, which acknowledges.
 
 B's modules (``secretary``, ``bar_raiser``) are imported lazily. Missing or broken,
 the loop falls back to a rules brief and summons nobody.
@@ -454,7 +456,7 @@ async def tick(ctx: Any, root: Path, now: float | None = None) -> dict:
         _meetings(mt, root, now)  # act on a bar raiser answer in the same tick
     sec = _optional("secretary")
     away = _batch_pause(root, now)
-    for lead_id in identity.active_leads(root):
+    for lead_id, lead in identity.active_leads(root).items():
         if limits.stopped(root):
             break
         member = fold.fold_member(root, lead_id)
@@ -482,7 +484,20 @@ async def tick(ctx: Any, root: Path, now: float | None = None) -> dict:
         seq = ledger.append(root, fold.member_file(lead_id), "wake/due", "app",
                             {**decision, "brief_id": brief_id})
         did["dues"].append((lead_id, seq))
+        if lead.get("bot"):
+            await _wake_bot_lead(ctx, root, lead_id, lead["bot"], seq)
     return did
+
+
+async def _wake_bot_lead(ctx: Any, root: Path, lead_id: str, bot: str, due_seq: int) -> str:
+    """Wake a Bot lead for one ``wake/due`` through the host's Bot API and record how it
+    went: ``wake/sent`` on success, ``wake/refused`` with the host's reason otherwise."""
+    from . import bot_wake
+
+    outcome = await bot_wake.wake_and_log(ctx, bot, bot_wake.due_ref(lead_id, due_seq))
+    kind = "wake/refused" if outcome.startswith("refused") else "wake/sent"
+    ledger.append(root, fold.member_file(lead_id), kind, "app", {"due_seq": due_seq, "outcome": outcome})
+    return outcome
 
 
 async def run_loop(ctx: Any, root: Path, stop: asyncio.Event, interval: float = LOOP_SECS) -> None:

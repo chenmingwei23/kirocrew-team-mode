@@ -488,7 +488,7 @@ function clickFlips(target, selectedText = "") {
 const BASE = "/api/apps/team-mode";
 const POLL_MS = 2e3;
 const APPROX = {
-  wake: { label: "wake ≤ 60 s", tip: "Approximate: the app can only wake a lead through the 60-second script cron that lead set up itself, not instantly." },
+  wake: { label: "wake ≤ 60 s", tip: "Approximate: a Bot lead is woken through Kiro Crew and reads its inbox when its current turn ends; an older lead chat is woken by the 60-second script cron it set up itself." },
   identity: { label: "identity = session label", tip: "Approximate: identity is the session label, not a credential. A session with a shell could get around it." },
   relay: { label: "self-reported", tip: "Approximate: the app cannot read the work ledger dispatch chain; the lead reported this path itself with team_relay_note." },
   tokens: { label: "estimate", tip: "Approximate: the app cannot read real token usage. Estimated at ≈ 45k per warm wake and ≈ 96k per cold wake." },
