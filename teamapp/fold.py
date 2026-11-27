@@ -52,8 +52,12 @@ _LEAD_ID_RE = re.compile(r"(?:\blead:)?\bL-[0-9a-f]{8}\b")
 
 
 def handles(root: Path) -> dict[str, str]:
-    """lead id -> handle (the id itself when a lead has no handle)."""
-    return {lid: lead.get("handle") or lid for lid, lead in directory(root)["leads"].items()}
+    """lead id -> handle (the id itself when a lead has no handle). The other owner of a
+    shared group (``peer:P-x``, whose Bots this directory lists) reads "Other owner"."""
+    leads = directory(root)["leads"]
+    out = {f"peer:{l['peer']}": "Other owner" for l in leads.values() if l.get("peer")}
+    out.update({lid: lead.get("handle") or lid for lid, lead in leads.items()})
+    return out
 
 
 def display_by(by: object, names: dict[str, str]) -> object:

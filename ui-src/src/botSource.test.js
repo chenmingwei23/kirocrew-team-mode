@@ -83,6 +83,7 @@ test('leadKind: a legacy lead chat is labelled Legacy lead', () => {
   assert.equal(leadKind({ kind: 'bot' }).label, 'Bot')
   assert.equal(leadKind({ kind: 'chat' }).label, 'Legacy lead')
   assert.equal(leadKind({}).kind, 'legacy')
+  assert.equal(leadKind({ kind: 'remote' }).label, "Other owner's Bot")
 })
 
 test('botGroups: one Bot in several groups; closed groups and DMs left out', () => {

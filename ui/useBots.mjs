@@ -46,7 +46,9 @@ function leadForBot(bot, leads) {
   return [...leads?.values?.() || leads || []].find((l) => l.active !== false && (l.bot === bot.bot || bot.session_label && l.session_label === bot.session_label));
 }
 function leadKind(lead) {
-  return lead?.kind === "bot" ? { kind: "bot", label: "Bot" } : { kind: "legacy", label: "Legacy lead" };
+  if (lead?.kind === "bot") return { kind: "bot", label: "Bot" };
+  if (lead?.kind === "remote") return { kind: "remote", label: "Other owner's Bot" };
+  return { kind: "legacy", label: "Legacy lead" };
 }
 function addCheck(bot, leads) {
   if (!bot.slot_key) return { ok: false, why: "Open this Bot once on the Bots page first." };
